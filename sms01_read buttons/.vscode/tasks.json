@@ -1,0 +1,18 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build ROM",
+            "type": "shell",
+            //-mz80:sms -autobank -c
+            "windows": {"command": "mkdir build & ..\\gbdk\\bin\\lcc -mz80:sms -Wm-yoA -Wl-j -debug -o build\\game.sms main.c"}, //${filename}.c
+            "osx": {"command": "../gbdk/bin/lcc -mz80:sms -debug -o build/game.sms main.c"},
+            //"command": "",
+            "problemMatcher": ["$msCompile", "$gcc"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}

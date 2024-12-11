@@ -1,0 +1,159 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ISO C Compiler 
+                                      3 ; Version 4.4.1 #14650 (MINGW64)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module samptest
+                                      6 	.optsdcc -mz80
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl _main
+                                     12 	.globl _cut_sample
+                                     13 	.globl _play_sample
+                                     14 	.globl _puts
+                                     15 	.globl _joypad
+                                     16 	.globl _vsync
+                                     17 	.globl _joy
+                                     18 	.globl _old_joy
+                                     19 ;--------------------------------------------------------
+                                     20 ; special function registers
+                                     21 ;--------------------------------------------------------
+                         00000000    22 _GG_STATE	=	0x0000
+                         00000001    23 _GG_EXT_7BIT	=	0x0001
+                         00000002    24 _GG_EXT_CTL	=	0x0002
+                         00000003    25 _GG_SIO_SEND	=	0x0003
+                         00000004    26 _GG_SIO_RECV	=	0x0004
+                         00000005    27 _GG_SIO_CTL	=	0x0005
+                         00000006    28 _GG_SOUND_PAN	=	0x0006
+                         0000003E    29 _MEMORY_CTL	=	0x003e
+                         0000003F    30 _JOY_CTL	=	0x003f
+                         0000007E    31 _VCOUNTER	=	0x007e
+                         0000007F    32 _PSG	=	0x007f
+                         0000007F    33 _HCOUNTER	=	0x007f
+                         000000BE    34 _VDP_DATA	=	0x00be
+                         000000BF    35 _VDP_CMD	=	0x00bf
+                         000000BF    36 _VDP_STATUS	=	0x00bf
+                         000000DC    37 _JOY_PORT1	=	0x00dc
+                         000000DD    38 _JOY_PORT2	=	0x00dd
+                         000000F0    39 _FMADDRESS	=	0x00f0
+                         000000F1    40 _FMDATA	=	0x00f1
+                         000000F2    41 _AUDIOCTRL	=	0x00f2
+                                     42 ;--------------------------------------------------------
+                                     43 ; ram data
+                                     44 ;--------------------------------------------------------
+                                     45 	.area _DATA
+                         0000FFFC    46 _RAM_CONTROL	=	0xfffc
+                         0000FFF8    47 _GLASSES_3D	=	0xfff8
+                         0000FFFD    48 _MAP_FRAME0	=	0xfffd
+                         0000FFFE    49 _MAP_FRAME1	=	0xfffe
+                         0000FFFF    50 _MAP_FRAME2	=	0xffff
+    00000000                         51 _old_joy::
+    00000000                         52 	.ds 1
+                                     53 ;--------------------------------------------------------
+                                     54 ; ram data
+                                     55 ;--------------------------------------------------------
+                                     56 	.area _INITIALIZED
+    00000000                         57 _joy::
+    00000000                         58 	.ds 1
+                                     59 ;--------------------------------------------------------
+                                     60 ; absolute external ram data
+                                     61 ;--------------------------------------------------------
+                                     62 	.area _DABS (ABS)
+                                     63 ;--------------------------------------------------------
+                                     64 ; global & static initialisations
+                                     65 ;--------------------------------------------------------
+                                     66 	.area _HOME
+                                     67 	.area _GSINIT
+                                     68 	.area _GSFINAL
+                                     69 	.area _GSINIT
+                                     70 ;--------------------------------------------------------
+                                     71 ; Home
+                                     72 ;--------------------------------------------------------
+                                     73 	.area _HOME
+                                     74 	.area _HOME
+                                     75 ;--------------------------------------------------------
+                                     76 ; code
+                                     77 ;--------------------------------------------------------
+                                     78 	.area _CODE
+                                     79 ;src\samptest.c:20: void main(void) {
+                                     80 ;	---------------------------------
+                                     81 ; Function main
+                                     82 ; ---------------------------------
+    00000000                         83 _main::
+                                     84 ;src\samptest.c:21: puts("PRESS A/B TO PLAY\n");
+    00000000 21r65r00         [10]   85 	ld	hl, #___str_0
+    00000003 CDr00r00         [17]   86 	call	_puts
+                                     87 ;src\samptest.c:23: while (true) {
+    00000006                         88 00107$:
+                                     89 ;src\samptest.c:14: old_joy = joy, joy = joypad();
+    00000006 3Ar00r00         [13]   90 	ld	a, (_joy+0)
+    00000009 32r00r00         [13]   91 	ld	(_old_joy+0), a
+    0000000C CDr00r00         [17]   92 	call	_joypad
+    0000000F 7D               [ 4]   93 	ld	a, l
+    00000010 32r00r00         [13]   94 	ld	(_joy+0), a
+                                     95 ;src\samptest.c:17: return ((joy & ~old_joy) & key);
+    00000013 3Ar00r00         [13]   96 	ld	a, (_old_joy+0)
+    00000016 2F               [ 4]   97 	cpl
+    00000017 4F               [ 4]   98 	ld	c, a
+    00000018 3Ar00r00         [13]   99 	ld	a, (_joy+0)
+    0000001B A1               [ 4]  100 	and	a, c
+    0000001C CB 6F            [ 8]  101 	bit	5, a
+    0000001E 28 1F            [12]  102 	jr	Z, 00104$
+                                    103 ;src\samptest.c:26: if (KEY_PRESSED(J_A)) {
+                                    104 ;src\samptest.c:27: bank_save = CURRENT_BANK;
+    00000020 3A FE FF         [13]  105 	ld	a, (_MAP_FRAME1+0)
+    00000023 4F               [ 4]  106 	ld	c, a
+                                    107 ;src\samptest.c:28: SWITCH_ROM(BANK(cowbell_8bit_pcm_unsigned));
+    00000024 21 FE FF         [10]  108 	ld	hl, #_MAP_FRAME1
+    00000027 36r00            [10]  109 	ld	(hl), #<(___bank_cowbell_8bit_pcm_unsigned)
+                                    110 ;src\samptest.c:29: play_sample(cowbell_8bit_pcm_unsigned, sizeof(cowbell_8bit_pcm_unsigned));
+    00000029 C5               [11]  111 	push	bc
+    0000002A 11 80 1F         [10]  112 	ld	de, #0x1f80
+    0000002D 21r00r00         [10]  113 	ld	hl, #_cowbell_8bit_pcm_unsigned
+    00000030 CDr00r00         [17]  114 	call	_play_sample
+    00000033 3E 07            [ 7]  115 	ld	a, #0x07
+    00000035 CDr00r00         [17]  116 	call	_cut_sample
+    00000038 C1               [10]  117 	pop	bc
+                                    118 ;src\samptest.c:31: SWITCH_ROM(bank_save);
+    00000039 79               [ 4]  119 	ld	a, c
+    0000003A 32 FE FF         [13]  120 	ld	(#_MAP_FRAME1), a
+    0000003D 18 21            [12]  121 	jr	00105$
+    0000003F                        122 00104$:
+                                    123 ;src\samptest.c:17: return ((joy & ~old_joy) & key);
+    0000003F CB 67            [ 8]  124 	bit	4, a
+    00000041 28 1D            [12]  125 	jr	Z, 00105$
+                                    126 ;src\samptest.c:33: } else if (KEY_PRESSED(J_B)) {
+                                    127 ;src\samptest.c:34: bank_save = CURRENT_BANK;
+    00000043 3A FE FF         [13]  128 	ld	a, (_MAP_FRAME1+0)
+    00000046 4F               [ 4]  129 	ld	c, a
+                                    130 ;src\samptest.c:35: SWITCH_ROM(BANK(risset_drum_8bit_pcm_unsigned));
+    00000047 21 FE FF         [10]  131 	ld	hl, #_MAP_FRAME1
+    0000004A 36r00            [10]  132 	ld	(hl), #<(___bank_risset_drum_8bit_pcm_unsigned)
+                                    133 ;src\samptest.c:36: play_sample(risset_drum_8bit_pcm_unsigned, sizeof(risset_drum_8bit_pcm_unsigned));
+    0000004C C5               [11]  134 	push	bc
+    0000004D 11 10 0E         [10]  135 	ld	de, #0x0e10
+    00000050 21r00r00         [10]  136 	ld	hl, #_risset_drum_8bit_pcm_unsigned
+    00000053 CDr00r00         [17]  137 	call	_play_sample
+    00000056 3E 07            [ 7]  138 	ld	a, #0x07
+    00000058 CDr00r00         [17]  139 	call	_cut_sample
+    0000005B C1               [10]  140 	pop	bc
+                                    141 ;src\samptest.c:38: SWITCH_ROM(bank_save);
+    0000005C 79               [ 4]  142 	ld	a, c
+    0000005D 32 FE FF         [13]  143 	ld	(#_MAP_FRAME1), a
+    00000060                        144 00105$:
+                                    145 ;src\samptest.c:40: vsync();
+    00000060 CDr00r00         [17]  146 	call	_vsync
+                                    147 ;src\samptest.c:42: }
+    00000063 18 A1            [12]  148 	jr	00107$
+    00000065                        149 ___str_0:
+    00000065 50 52 45 53 53 20 41   150 	.ascii "PRESS A/B TO PLAY"
+             2F 42 20 54 4F 20 50
+             4C 41 59
+    00000076 0A                     151 	.db 0x0a
+    00000077 00                     152 	.db 0x00
+                                    153 	.area _CODE
+                                    154 	.area _INITIALIZER
+    00000000                        155 __xinit__joy:
+    00000000 00                     156 	.db #0x00	; 0
+                                    157 	.area _CABS (ABS)

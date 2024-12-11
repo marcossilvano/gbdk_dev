@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "numbertiles.h": "c",
+        "splashscreen_tileset.h": "c",
+        "gb.h": "c",
+        "city_tileset.h": "c",
+        "hardware.h": "c"
+    }
+}

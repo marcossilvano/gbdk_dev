@@ -1,0 +1,687 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ISO C Compiler 
+                                      3 ; Version 4.4.1 #14650 (MINGW64)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module smoketest
+                                      6 	.optsdcc -mz80
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl _main
+                                     12 	.globl b_banked_func
+                                     13 	.globl _banked_func
+                                     14 	.globl _set_tile_map_compat
+                                     15 	.globl _set_tile_map
+                                     16 	.globl _set_tile_2bpp_data
+                                     17 	.globl _joypad_ex
+                                     18 	.globl _joypad_init
+                                     19 	.globl _vsync
+                                     20 	.globl _tick
+                                     21 	.globl _anim
+                                     22 	.globl _yspd
+                                     23 	.globl _xspd
+                                     24 	.globl _y
+                                     25 	.globl _x
+                                     26 	.globl _joy
+                                     27 	.globl _tilemapw
+                                     28 	.globl _tilemap
+                                     29 ;--------------------------------------------------------
+                                     30 ; special function registers
+                                     31 ;--------------------------------------------------------
+                         00000000    32 _GG_STATE	=	0x0000
+                         00000001    33 _GG_EXT_7BIT	=	0x0001
+                         00000002    34 _GG_EXT_CTL	=	0x0002
+                         00000003    35 _GG_SIO_SEND	=	0x0003
+                         00000004    36 _GG_SIO_RECV	=	0x0004
+                         00000005    37 _GG_SIO_CTL	=	0x0005
+                         00000006    38 _GG_SOUND_PAN	=	0x0006
+                         0000003E    39 _MEMORY_CTL	=	0x003e
+                         0000003F    40 _JOY_CTL	=	0x003f
+                         0000007E    41 _VCOUNTER	=	0x007e
+                         0000007F    42 _PSG	=	0x007f
+                         0000007F    43 _HCOUNTER	=	0x007f
+                         000000BE    44 _VDP_DATA	=	0x00be
+                         000000BF    45 _VDP_CMD	=	0x00bf
+                         000000BF    46 _VDP_STATUS	=	0x00bf
+                         000000DC    47 _JOY_PORT1	=	0x00dc
+                         000000DD    48 _JOY_PORT2	=	0x00dd
+                         000000F0    49 _FMADDRESS	=	0x00f0
+                         000000F1    50 _FMDATA	=	0x00f1
+                         000000F2    51 _AUDIOCTRL	=	0x00f2
+                                     52 ;--------------------------------------------------------
+                                     53 ; ram data
+                                     54 ;--------------------------------------------------------
+                                     55 	.area _DATA
+                         0000FFFC    56 _RAM_CONTROL	=	0xfffc
+                         0000FFF8    57 _GLASSES_3D	=	0xfff8
+                         0000FFFD    58 _MAP_FRAME0	=	0xfffd
+                         0000FFFE    59 _MAP_FRAME1	=	0xfffe
+                         0000FFFF    60 _MAP_FRAME2	=	0xffff
+    00000000                         61 _joy::
+    00000000                         62 	.ds 5
+                                     63 ;--------------------------------------------------------
+                                     64 ; ram data
+                                     65 ;--------------------------------------------------------
+                                     66 	.area _INITIALIZED
+    00000000                         67 _x::
+    00000000                         68 	.ds 2
+    00000002                         69 _y::
+    00000002                         70 	.ds 2
+    00000004                         71 _xspd::
+    00000004                         72 	.ds 1
+    00000005                         73 _yspd::
+    00000005                         74 	.ds 1
+    00000006                         75 _anim::
+    00000006                         76 	.ds 1
+    00000007                         77 _tick::
+    00000007                         78 	.ds 1
+                                     79 ;--------------------------------------------------------
+                                     80 ; absolute external ram data
+                                     81 ;--------------------------------------------------------
+                                     82 	.area _DABS (ABS)
+                                     83 ;--------------------------------------------------------
+                                     84 ; global & static initialisations
+                                     85 ;--------------------------------------------------------
+                                     86 	.area _HOME
+                                     87 	.area _GSINIT
+                                     88 	.area _GSFINAL
+                                     89 	.area _GSINIT
+                                     90 ;--------------------------------------------------------
+                                     91 ; Home
+                                     92 ;--------------------------------------------------------
+                                     93 	.area _HOME
+                                     94 	.area _HOME
+                                     95 ;--------------------------------------------------------
+                                     96 ; code
+                                     97 ;--------------------------------------------------------
+                                     98 	.area _CODE
+                                     99 ;smoketest.c:20: void main(void) {
+                                    100 ;	---------------------------------
+                                    101 ; Function main
+                                    102 ; ---------------------------------
+    00000000                        103 _main::
+    00000000 DD E5            [15]  104 	push	ix
+    00000002 DD 21 00 00      [14]  105 	ld	ix,#0
+    00000006 DD 39            [15]  106 	add	ix,sp
+    00000008 F5               [11]  107 	push	af
+    00000009 F5               [11]  108 	push	af
+                                    109 ;smoketest.c:21: HIDE_LEFT_COLUMN;
+    0000000A 3Ar00r00         [13]  110 	ld	a, (_shadow_VDP_R0+0)
+    0000000D F6 20            [ 7]  111 	or	a, #0x20
+    0000000F 32r00r00         [13]  112 	ld	(_shadow_VDP_R0+0), a
+    00000012 F3               [ 4]  113 	di
+    00000013 3Ar00r00         [13]  114 	ld	a, (_shadow_VDP_R0+0)
+    00000016 D3 BF            [11]  115 	out	(_VDP_CMD), a
+    00000018 3E 80            [ 7]  116 	ld	a, #0x80
+    0000001A D3 BF            [11]  117 	out	(_VDP_CMD), a
+    0000001C FB               [ 4]  118 	ei
+                                    119 ;smoketest.c:22: SPRITES_8x16;
+    0000001D 3Ar00r00         [13]  120 	ld	a, (_shadow_VDP_R1+0)
+    00000020 F6 02            [ 7]  121 	or	a, #0x02
+    00000022 32r00r00         [13]  122 	ld	(_shadow_VDP_R1+0), a
+    00000025 F3               [ 4]  123 	di
+    00000026 3Ar00r00         [13]  124 	ld	a, (_shadow_VDP_R1+0)
+    00000029 D3 BF            [11]  125 	out	(_VDP_CMD), a
+    0000002B 3E 81            [ 7]  126 	ld	a, #0x81
+    0000002D D3 BF            [11]  127 	out	(_VDP_CMD), a
+    0000002F FB               [ 4]  128 	ei
+                                    129 ;smoketest.c:23: DISPLAY_ON;
+    00000030 3Ar00r00         [13]  130 	ld	a, (_shadow_VDP_R1+0)
+    00000033 F6 40            [ 7]  131 	or	a, #0x40
+    00000035 32r00r00         [13]  132 	ld	(_shadow_VDP_R1+0), a
+    00000038 F3               [ 4]  133 	di
+    00000039 3Ar00r00         [13]  134 	ld	a, (_shadow_VDP_R1+0)
+    0000003C D3 BF            [11]  135 	out	(_VDP_CMD), a
+    0000003E 3E 81            [ 7]  136 	ld	a, #0x81
+    00000040 D3 BF            [11]  137 	out	(_VDP_CMD), a
+    00000042 FB               [ 4]  138 	ei
+                                    139 ;smoketest.c:27: SWITCH_ROM(BANK(earth_data));
+    00000043 21 FE FF         [10]  140 	ld	hl, #_MAP_FRAME1
+    00000046 36r00            [10]  141 	ld	(hl), #<(___bank_earth_data)
+                                    142 ;smoketest.c:28: if (banked_func(0xBE, 0xEF) == 0xBEEF) {
+    00000048 3E EF            [ 7]  143 	ld	a, #0xef
+    0000004A F5               [11]  144 	push	af
+    0000004B 33               [ 6]  145 	inc	sp
+    0000004C 3E BE            [ 7]  146 	ld	a, #0xbe
+    0000004E F5               [11]  147 	push	af
+    0000004F 33               [ 6]  148 	inc	sp
+    00000050 1Er00            [ 7]  149 	ld	e, #b_banked_func
+    00000052 21r00r00         [10]  150 	ld	hl, #_banked_func
+    00000055 CDr00r00         [17]  151 	call	___sdcc_bcall_ehl
+    00000058 F1               [10]  152 	pop	af
+    00000059 7B               [ 4]  153 	ld	a, e
+    0000005A D6 EF            [ 7]  154 	sub	a, #0xef
+    0000005C 20 57            [12]  155 	jr	NZ, 00102$
+    0000005E 7A               [ 4]  156 	ld	a, d
+    0000005F D6 BE            [ 7]  157 	sub	a, #0xbe
+    00000061 20 52            [12]  158 	jr	NZ, 00102$
+                                    159 ;smoketest.c:29: set_bkg_data(2, earth_data_size >> 4, earth_data);
+    00000063 11r00r00         [10]  160 	ld	de, #_earth_data
+    00000066 ED 4Br00r00      [20]  161 	ld	bc, (_earth_data_size)
+    0000006A CB 38            [ 8]  162 	srl	b
+    0000006C CB 19            [ 8]  163 	rr	c
+    0000006E CB 38            [ 8]  164 	srl	b
+    00000070 CB 19            [ 8]  165 	rr	c
+    00000072 CB 38            [ 8]  166 	srl	b
+    00000074 CB 19            [ 8]  167 	rr	c
+    00000076 CB 38            [ 8]  168 	srl	b
+    00000078 CB 19            [ 8]  169 	rr	c
+                                    170 ;c:\gamedev\gbdk\include\sms\sms.h:633: set_tile_2bpp_data(start, ntiles, src, _current_2bpp_palette);
+    0000007A 2Ar00r00         [16]  171 	ld	hl, (__current_2bpp_palette)
+    0000007D E5               [11]  172 	push	hl
+    0000007E D5               [11]  173 	push	de
+    0000007F C5               [11]  174 	push	bc
+    00000080 21 02 00         [10]  175 	ld	hl, #0x0002
+    00000083 E5               [11]  176 	push	hl
+    00000084 CDr00r00         [17]  177 	call	_set_tile_2bpp_data
+                                    178 ;smoketest.c:30: set_sprite_data(0, earth_data_size >> 4, earth_data);
+    00000087 11r00r00         [10]  179 	ld	de, #_earth_data
+    0000008A ED 4Br00r00      [20]  180 	ld	bc, (_earth_data_size)
+    0000008E CB 38            [ 8]  181 	srl	b
+    00000090 CB 19            [ 8]  182 	rr	c
+    00000092 CB 38            [ 8]  183 	srl	b
+    00000094 CB 19            [ 8]  184 	rr	c
+    00000096 CB 38            [ 8]  185 	srl	b
+    00000098 CB 19            [ 8]  186 	rr	c
+    0000009A CB 38            [ 8]  187 	srl	b
+    0000009C CB 19            [ 8]  188 	rr	c
+                                    189 ;c:\gamedev\gbdk\include\sms\sms.h:636: set_tile_2bpp_data((uint8_t)(start) + 0x100u, ntiles, src, _current_2bpp_palette);
+    0000009E 2Ar00r00         [16]  190 	ld	hl, (__current_2bpp_palette)
+    000000A1 E5               [11]  191 	push	hl
+    000000A2 D5               [11]  192 	push	de
+    000000A3 C5               [11]  193 	push	bc
+    000000A4 21 00 01         [10]  194 	ld	hl, #0x0100
+    000000A7 E5               [11]  195 	push	hl
+    000000A8 CDr00r00         [17]  196 	call	_set_tile_2bpp_data
+                                    197 ;c:\gamedev\gbdk\include\sms\sms.h:807: shadow_OAM[0x41+(nb << 1)] = tile;
+    000000AB 21r41r00         [10]  198 	ld	hl, #_shadow_OAM+65
+    000000AE 36 00            [10]  199 	ld	(hl), #0x00
+    000000B0 21r43r00         [10]  200 	ld	hl, #_shadow_OAM+67
+    000000B3 36 02            [10]  201 	ld	(hl), #0x02
+                                    202 ;smoketest.c:32: set_sprite_tile(1, 2);
+    000000B5                        203 00102$:
+                                    204 ;smoketest.c:35: set_bkg_tiles(4, 10, 4, 2, tilemap);
+    000000B5 21rAFr03         [10]  205 	ld	hl, #_tilemap
+    000000B8 E5               [11]  206 	push	hl
+    000000B9 21 04 02         [10]  207 	ld	hl, #0x204
+    000000BC E5               [11]  208 	push	hl
+    000000BD 21 04 0A         [10]  209 	ld	hl, #0xa04
+    000000C0 E5               [11]  210 	push	hl
+    000000C1 CDr00r00         [17]  211 	call	_set_tile_map_compat
+                                    212 ;smoketest.c:37: set_tile_map(4, 16, 4, 2, tilemapw);
+    000000C4 21rB7r03         [10]  213 	ld	hl, #_tilemapw
+    000000C7 E5               [11]  214 	push	hl
+    000000C8 21 04 02         [10]  215 	ld	hl, #0x204
+    000000CB E5               [11]  216 	push	hl
+    000000CC 21 04 10         [10]  217 	ld	hl, #0x1004
+    000000CF E5               [11]  218 	push	hl
+    000000D0 CDr00r00         [17]  219 	call	_set_tile_map
+                                    220 ;smoketest.c:39: joypad_init(2, &joy);
+    000000D3 21r00r00         [10]  221 	ld	hl, #_joy
+    000000D6 E5               [11]  222 	push	hl
+    000000D7 3E 02            [ 7]  223 	ld	a, #0x02
+    000000D9 F5               [11]  224 	push	af
+    000000DA 33               [ 6]  225 	inc	sp
+    000000DB CDr00r00         [17]  226 	call	_joypad_init
+                                    227 ;smoketest.c:41: while(TRUE) {
+    000000DE                        228 00158$:
+                                    229 ;smoketest.c:42: joypad_ex(&joy);
+    000000DE 21r00r00         [10]  230 	ld	hl, #_joy
+    000000E1 CDr00r00         [17]  231 	call	_joypad_ex
+                                    232 ;smoketest.c:44: if (joy.joy0 & J_LEFT) {            
+    000000E4 3Ar01r00         [13]  233 	ld	a, (#(_joy + 1) + 0)
+    000000E7 CB 57            [ 8]  234 	bit	2, a
+    000000E9 28 1A            [12]  235 	jr	Z, 00116$
+                                    236 ;smoketest.c:45: if (xspd > -32) xspd -= 2; 
+    000000EB 3E E0            [ 7]  237 	ld	a, #0xe0
+    000000ED 21r04r00         [10]  238 	ld	hl, #_xspd
+    000000F0 96               [ 7]  239 	sub	a, (hl)
+    000000F1 E2rF6r00         [10]  240 	jp	PO, 00384$
+    000000F4 EE 80            [ 7]  241 	xor	a, #0x80
+    000000F6                        242 00384$:
+    000000F6 F2r3Cr01         [10]  243 	jp	P, 00117$
+    000000F9 FD 21r04r00      [14]  244 	ld	iy, #_xspd
+    000000FD FD 35 00         [23]  245 	dec	0 (iy)
+    00000100 FD 35 00         [23]  246 	dec	0 (iy)
+    00000103 18 37            [12]  247 	jr	00117$
+    00000105                        248 00116$:
+                                    249 ;smoketest.c:46: } else if (joy.joy0 & J_RIGHT) {
+    00000105 CB 5F            [ 8]  250 	bit	3, a
+    00000107 28 15            [12]  251 	jr	Z, 00113$
+                                    252 ;smoketest.c:47: if (xspd < 32) xspd += 2;
+    00000109 3Ar04r00         [13]  253 	ld	a, (_xspd+0)
+    0000010C EE 80            [ 7]  254 	xor	a, #0x80
+    0000010E D6 A0            [ 7]  255 	sub	a, #0xa0
+    00000110 30 2A            [12]  256 	jr	NC, 00117$
+    00000112 FD 21r04r00      [14]  257 	ld	iy, #_xspd
+    00000116 FD 34 00         [23]  258 	inc	0 (iy)
+    00000119 FD 34 00         [23]  259 	inc	0 (iy)
+    0000011C 18 1E            [12]  260 	jr	00117$
+    0000011E                        261 00113$:
+                                    262 ;smoketest.c:49: if (xspd < 0) xspd++; else if (xspd > 0) xspd--;            
+    0000011E 3Ar04r00         [13]  263 	ld	a, (_xspd+0)
+    00000121 CB 7F            [ 8]  264 	bit	7, a
+    00000123 28 06            [12]  265 	jr	Z, 00110$
+    00000125 21r04r00         [10]  266 	ld	hl, #_xspd
+    00000128 34               [11]  267 	inc	(hl)
+    00000129 18 11            [12]  268 	jr	00117$
+    0000012B                        269 00110$:
+    0000012B AF               [ 4]  270 	xor	a, a
+    0000012C 21r04r00         [10]  271 	ld	hl, #_xspd
+    0000012F 96               [ 7]  272 	sub	a, (hl)
+    00000130 E2r35r01         [10]  273 	jp	PO, 00386$
+    00000133 EE 80            [ 7]  274 	xor	a, #0x80
+    00000135                        275 00386$:
+    00000135 F2r3Cr01         [10]  276 	jp	P, 00117$
+    00000138 21r04r00         [10]  277 	ld	hl, #_xspd
+    0000013B 35               [11]  278 	dec	(hl)
+    0000013C                        279 00117$:
+                                    280 ;smoketest.c:52: if (joy.joy0 & J_UP) {
+    0000013C 3Ar01r00         [13]  281 	ld	a, (#(_joy + 1) + 0)
+    0000013F CB 47            [ 8]  282 	bit	0, a
+    00000141 28 1A            [12]  283 	jr	Z, 00131$
+                                    284 ;smoketest.c:53: if (yspd > -32) yspd -= 2; 
+    00000143 3E E0            [ 7]  285 	ld	a, #0xe0
+    00000145 21r05r00         [10]  286 	ld	hl, #_yspd
+    00000148 96               [ 7]  287 	sub	a, (hl)
+    00000149 E2r4Er01         [10]  288 	jp	PO, 00388$
+    0000014C EE 80            [ 7]  289 	xor	a, #0x80
+    0000014E                        290 00388$:
+    0000014E F2r94r01         [10]  291 	jp	P, 00132$
+    00000151 FD 21r05r00      [14]  292 	ld	iy, #_yspd
+    00000155 FD 35 00         [23]  293 	dec	0 (iy)
+    00000158 FD 35 00         [23]  294 	dec	0 (iy)
+    0000015B 18 37            [12]  295 	jr	00132$
+    0000015D                        296 00131$:
+                                    297 ;smoketest.c:54: } else if (joy.joy0 & J_DOWN) {
+    0000015D CB 4F            [ 8]  298 	bit	1, a
+    0000015F 28 15            [12]  299 	jr	Z, 00128$
+                                    300 ;smoketest.c:55: if (yspd < 32) yspd += 2;
+    00000161 3Ar05r00         [13]  301 	ld	a, (_yspd+0)
+    00000164 EE 80            [ 7]  302 	xor	a, #0x80
+    00000166 D6 A0            [ 7]  303 	sub	a, #0xa0
+    00000168 30 2A            [12]  304 	jr	NC, 00132$
+    0000016A FD 21r05r00      [14]  305 	ld	iy, #_yspd
+    0000016E FD 34 00         [23]  306 	inc	0 (iy)
+    00000171 FD 34 00         [23]  307 	inc	0 (iy)
+    00000174 18 1E            [12]  308 	jr	00132$
+    00000176                        309 00128$:
+                                    310 ;smoketest.c:57: if (yspd < 0) yspd++; else if (yspd > 0) yspd--;
+    00000176 3Ar05r00         [13]  311 	ld	a, (_yspd+0)
+    00000179 CB 7F            [ 8]  312 	bit	7, a
+    0000017B 28 06            [12]  313 	jr	Z, 00125$
+    0000017D 21r05r00         [10]  314 	ld	hl, #_yspd
+    00000180 34               [11]  315 	inc	(hl)
+    00000181 18 11            [12]  316 	jr	00132$
+    00000183                        317 00125$:
+    00000183 AF               [ 4]  318 	xor	a, a
+    00000184 21r05r00         [10]  319 	ld	hl, #_yspd
+    00000187 96               [ 7]  320 	sub	a, (hl)
+    00000188 E2r8Dr01         [10]  321 	jp	PO, 00390$
+    0000018B EE 80            [ 7]  322 	xor	a, #0x80
+    0000018D                        323 00390$:
+    0000018D F2r94r01         [10]  324 	jp	P, 00132$
+    00000190 21r05r00         [10]  325 	ld	hl, #_yspd
+    00000193 35               [11]  326 	dec	(hl)
+    00000194                        327 00132$:
+                                    328 ;smoketest.c:60: x += xspd;
+    00000194 3Ar04r00         [13]  329 	ld	a, (_xspd+0)
+    00000197 4F               [ 4]  330 	ld	c, a
+    00000198 07               [ 4]  331 	rlca
+    00000199 9F               [ 4]  332 	sbc	a, a
+    0000019A 47               [ 4]  333 	ld	b, a
+    0000019B 2Ar00r00         [16]  334 	ld	hl, (_x)
+    0000019E 09               [11]  335 	add	hl, bc
+    0000019F 22r00r00         [16]  336 	ld	(_x), hl
+                                    337 ;smoketest.c:61: if (x < (8 << 4)) x = 8 << 4; else if (x > (30 * 8) << 4) x = (30 * 8) << 4;
+    000001A2 3Ar00r00         [13]  338 	ld	a, (_x+0)
+    000001A5 D6 80            [ 7]  339 	sub	a, #0x80
+    000001A7 3Ar01r00         [13]  340 	ld	a, (_x+1)
+    000001AA 17               [ 4]  341 	rla
+    000001AB 3F               [ 4]  342 	ccf
+    000001AC 1F               [ 4]  343 	rra
+    000001AD DE 80            [ 7]  344 	sbc	a, #0x80
+    000001AF 30 08            [12]  345 	jr	NC, 00136$
+    000001B1 21 80 00         [10]  346 	ld	hl, #0x0080
+    000001B4 22r00r00         [16]  347 	ld	(_x), hl
+    000001B7 18 16            [12]  348 	jr	00137$
+    000001B9                        349 00136$:
+    000001B9 2Ar00r00         [16]  350 	ld	hl, (_x)
+    000001BC AF               [ 4]  351 	xor	a, a
+    000001BD BD               [ 4]  352 	cp	a, l
+    000001BE 3E 0F            [ 7]  353 	ld	a, #0x0f
+    000001C0 9C               [ 4]  354 	sbc	a, h
+    000001C1 E2rC6r01         [10]  355 	jp	PO, 00391$
+    000001C4 EE 80            [ 7]  356 	xor	a, #0x80
+    000001C6                        357 00391$:
+    000001C6 F2rCFr01         [10]  358 	jp	P, 00137$
+    000001C9 21 00 0F         [10]  359 	ld	hl, #0x0f00
+    000001CC 22r00r00         [16]  360 	ld	(_x), hl
+    000001CF                        361 00137$:
+                                    362 ;smoketest.c:64: y += yspd;
+    000001CF 3Ar05r00         [13]  363 	ld	a, (_yspd+0)
+    000001D2 4F               [ 4]  364 	ld	c, a
+    000001D3 07               [ 4]  365 	rlca
+    000001D4 9F               [ 4]  366 	sbc	a, a
+    000001D5 47               [ 4]  367 	ld	b, a
+    000001D6 2Ar02r00         [16]  368 	ld	hl, (_y)
+    000001D9 09               [11]  369 	add	hl, bc
+    000001DA 22r02r00         [16]  370 	ld	(_y), hl
+                                    371 ;smoketest.c:65: if (y < 0) y = 0; else if (y > (22 * 8) << 4) y = (22 * 8) << 4;
+    000001DD ED 4Br02r00      [20]  372 	ld	bc, (_y)
+    000001E1 CB 78            [ 8]  373 	bit	7, b
+    000001E3 28 08            [12]  374 	jr	Z, 00141$
+    000001E5 21 00 00         [10]  375 	ld	hl, #0x0000
+    000001E8 22r02r00         [16]  376 	ld	(_y), hl
+    000001EB 18 13            [12]  377 	jr	00142$
+    000001ED                        378 00141$:
+    000001ED AF               [ 4]  379 	xor	a, a
+    000001EE B9               [ 4]  380 	cp	a, c
+    000001EF 3E 0B            [ 7]  381 	ld	a, #0x0b
+    000001F1 98               [ 4]  382 	sbc	a, b
+    000001F2 E2rF7r01         [10]  383 	jp	PO, 00392$
+    000001F5 EE 80            [ 7]  384 	xor	a, #0x80
+    000001F7                        385 00392$:
+    000001F7 F2r00r02         [10]  386 	jp	P, 00142$
+    000001FA 21 00 0B         [10]  387 	ld	hl, #0x0b00
+    000001FD 22r02r00         [16]  388 	ld	(_y), hl
+    00000200                        389 00142$:
+                                    390 ;smoketest.c:67: tick++; tick &= 7;
+    00000200 FD 21r07r00      [14]  391 	ld	iy, #_tick
+    00000204 FD 34 00         [23]  392 	inc	0 (iy)
+    00000207 3Ar07r00         [13]  393 	ld	a, (_tick+0)
+    0000020A E6 07            [ 7]  394 	and	a, #0x07
+    0000020C 32r07r00         [13]  395 	ld	(_tick+0), a
+                                    396 ;smoketest.c:68: if (!tick) {
+    0000020F 3Ar07r00         [13]  397 	ld	a, (_tick+0)
+    00000212 B7               [ 4]  398 	or	a, a
+    00000213 20 28            [12]  399 	jr	NZ, 00146$
+                                    400 ;smoketest.c:69: anim++; if (anim == 7) anim = 0;
+    00000215 FD 21r06r00      [14]  401 	ld	iy, #_anim
+    00000219 FD 34 00         [23]  402 	inc	0 (iy)
+    0000021C 3Ar06r00         [13]  403 	ld	a, (_anim+0)
+    0000021F D6 07            [ 7]  404 	sub	a, #0x07
+    00000221 20 04            [12]  405 	jr	NZ, 00144$
+    00000223 FD 36 00 00      [19]  406 	ld	0 (iy), #0x00
+    00000227                        407 00144$:
+                                    408 ;smoketest.c:70: set_sprite_tile(0, anim << 2);
+    00000227 3Ar06r00         [13]  409 	ld	a, (_anim+0)
+    0000022A 87               [ 4]  410 	add	a, a
+    0000022B 87               [ 4]  411 	add	a, a
+    0000022C 4F               [ 4]  412 	ld	c, a
+                                    413 ;c:\gamedev\gbdk\include\sms\sms.h:807: shadow_OAM[0x41+(nb << 1)] = tile;
+    0000022D 21r41r00         [10]  414 	ld	hl, #(_shadow_OAM + 65)
+    00000230 71               [ 7]  415 	ld	(hl), c
+                                    416 ;smoketest.c:71: set_sprite_tile(1, (anim << 2) + 2);
+    00000231 3Ar06r00         [13]  417 	ld	a, (_anim+0)
+    00000234 87               [ 4]  418 	add	a, a
+    00000235 87               [ 4]  419 	add	a, a
+    00000236 C6 02            [ 7]  420 	add	a, #0x02
+    00000238 4F               [ 4]  421 	ld	c, a
+                                    422 ;c:\gamedev\gbdk\include\sms\sms.h:807: shadow_OAM[0x41+(nb << 1)] = tile;
+    00000239 21r43r00         [10]  423 	ld	hl, #(_shadow_OAM + 67)
+    0000023C 71               [ 7]  424 	ld	(hl), c
+                                    425 ;smoketest.c:71: set_sprite_tile(1, (anim << 2) + 2);
+    0000023D                        426 00146$:
+                                    427 ;smoketest.c:74: move_sprite(0, x >> 4, y >> 4);
+    0000023D ED 5Br02r00      [20]  428 	ld	de, (_y)
+    00000241 CB 2A            [ 8]  429 	sra	d
+    00000243 CB 1B            [ 8]  430 	rr	e
+    00000245 CB 2A            [ 8]  431 	sra	d
+    00000247 CB 1B            [ 8]  432 	rr	e
+    00000249 CB 2A            [ 8]  433 	sra	d
+    0000024B CB 1B            [ 8]  434 	rr	e
+    0000024D CB 2A            [ 8]  435 	sra	d
+    0000024F CB 1B            [ 8]  436 	rr	e
+    00000251 ED 4Br00r00      [20]  437 	ld	bc, (_x)
+    00000255 CB 28            [ 8]  438 	sra	b
+    00000257 CB 19            [ 8]  439 	rr	c
+    00000259 CB 28            [ 8]  440 	sra	b
+    0000025B CB 19            [ 8]  441 	rr	c
+    0000025D CB 28            [ 8]  442 	sra	b
+    0000025F CB 19            [ 8]  443 	rr	c
+    00000261 CB 28            [ 8]  444 	sra	b
+    00000263 CB 19            [ 8]  445 	rr	c
+                                    446 ;c:\gamedev\gbdk\include\sms\sms.h:848: shadow_OAM[nb] = (y < VDP_SAT_TERM) ? y : 0xC0;
+    00000265 7B               [ 4]  447 	ld	a, e
+    00000266 D6 D0            [ 7]  448 	sub	a, #0xd0
+    00000268 38 02            [12]  449 	jr	C, 00175$
+    0000026A 1E C0            [ 7]  450 	ld	e, #0xc0
+    0000026C                        451 00175$:
+    0000026C 21r00r00         [10]  452 	ld	hl, #_shadow_OAM
+    0000026F 73               [ 7]  453 	ld	(hl), e
+                                    454 ;c:\gamedev\gbdk\include\sms\sms.h:849: shadow_OAM[0x40+(nb << 1)] = x;
+    00000270 21r40r00         [10]  455 	ld	hl, #(_shadow_OAM + 64)
+    00000273 71               [ 7]  456 	ld	(hl), c
+                                    457 ;smoketest.c:75: move_sprite(1, (x >> 4) + 8, y >> 4);
+    00000274 ED 5Br02r00      [20]  458 	ld	de, (_y)
+    00000278 CB 2A            [ 8]  459 	sra	d
+    0000027A CB 1B            [ 8]  460 	rr	e
+    0000027C CB 2A            [ 8]  461 	sra	d
+    0000027E CB 1B            [ 8]  462 	rr	e
+    00000280 CB 2A            [ 8]  463 	sra	d
+    00000282 CB 1B            [ 8]  464 	rr	e
+    00000284 CB 2A            [ 8]  465 	sra	d
+    00000286 CB 1B            [ 8]  466 	rr	e
+    00000288 2Ar00r00         [16]  467 	ld	hl, (_x)
+    0000028B CB 2C            [ 8]  468 	sra	h
+    0000028D CB 1D            [ 8]  469 	rr	l
+    0000028F CB 2C            [ 8]  470 	sra	h
+    00000291 CB 1D            [ 8]  471 	rr	l
+    00000293 CB 2C            [ 8]  472 	sra	h
+    00000295 CB 1D            [ 8]  473 	rr	l
+    00000297 CB 2C            [ 8]  474 	sra	h
+    00000299 CB 1D            [ 8]  475 	rr	l
+    0000029B 7D               [ 4]  476 	ld	a, l
+    0000029C C6 08            [ 7]  477 	add	a, #0x08
+    0000029E 4F               [ 4]  478 	ld	c, a
+                                    479 ;c:\gamedev\gbdk\include\sms\sms.h:848: shadow_OAM[nb] = (y < VDP_SAT_TERM) ? y : 0xC0;
+    0000029F 7B               [ 4]  480 	ld	a, e
+    000002A0 D6 D0            [ 7]  481 	sub	a, #0xd0
+    000002A2 38 02            [12]  482 	jr	C, 00177$
+    000002A4 1E C0            [ 7]  483 	ld	e, #0xc0
+    000002A6                        484 00177$:
+    000002A6 21r01r00         [10]  485 	ld	hl, #(_shadow_OAM + 1)
+    000002A9 73               [ 7]  486 	ld	(hl), e
+                                    487 ;c:\gamedev\gbdk\include\sms\sms.h:849: shadow_OAM[0x40+(nb << 1)] = x;
+    000002AA 21r42r00         [10]  488 	ld	hl, #(_shadow_OAM + 66)
+    000002AD 71               [ 7]  489 	ld	(hl), c
+                                    490 ;smoketest.c:77: if (joy.joy1 & J_LEFT) {
+    000002AE 21r02r00         [10]  491 	ld	hl, #(_joy + 2)
+    000002B1 5E               [ 7]  492 	ld	e, (hl)
+                                    493 ;c:\gamedev\gbdk\include\sms\sms.h:228: __WRITE_VDP_REG(VDP_RSCX, __READ_VDP_REG(VDP_RSCX) - x);
+    000002B2 3Ar00r00         [13]  494 	ld	a, (_shadow_VDP_RSCX+0)
+    000002B5 4F               [ 4]  495 	ld	c, a
+                                    496 ;c:\gamedev\gbdk\include\sms\sms.h:229: int16_t tmp = __READ_VDP_REG(VDP_RSCY) + y;
+    000002B6 3Ar00r00         [13]  497 	ld	a, (_shadow_VDP_RSCY+0)
+    000002B9 57               [ 4]  498 	ld	d, a
+                                    499 ;smoketest.c:77: if (joy.joy1 & J_LEFT) {
+    000002BA CB 53            [ 8]  500 	bit	2, e
+    000002BC 28 29            [12]  501 	jr	Z, 00150$
+                                    502 ;c:\gamedev\gbdk\include\sms\sms.h:228: __WRITE_VDP_REG(VDP_RSCX, __READ_VDP_REG(VDP_RSCX) - x);
+    000002BE 21r00r00         [10]  503 	ld	hl, #_shadow_VDP_RSCX
+    000002C1 79               [ 4]  504 	ld	a, c
+    000002C2 C6 01            [ 7]  505 	add	a, #0x01
+    000002C4 77               [ 7]  506 	ld	(hl), a
+    000002C5 F3               [ 4]  507 	di
+    000002C6 3Ar00r00         [13]  508 	ld	a, (_shadow_VDP_RSCX+0)
+    000002C9 D3 BF            [11]  509 	out	(_VDP_CMD), a
+    000002CB 3E 88            [ 7]  510 	ld	a, #0x88
+    000002CD D3 BF            [11]  511 	out	(_VDP_CMD), a
+    000002CF FB               [ 4]  512 	ei
+                                    513 ;c:\gamedev\gbdk\include\sms\sms.h:229: int16_t tmp = __READ_VDP_REG(VDP_RSCY) + y;
+                                    514 ;c:\gamedev\gbdk\include\sms\sms.h:230: __WRITE_VDP_REG(VDP_RSCY, (tmp < 0) ? 224 + tmp : tmp % 224u);
+    000002D0 2E E0            [ 7]  515 	ld	l, #0xe0
+                                    516 ;	spillPairReg hl
+                                    517 ;	spillPairReg hl
+    000002D2 7A               [ 4]  518 	ld	a, d
+    000002D3 CDr00r00         [17]  519 	call	__moduchar
+    000002D6 7B               [ 4]  520 	ld	a, e
+    000002D7 32r00r00         [13]  521 	ld	(_shadow_VDP_RSCY+0), a
+    000002DA F3               [ 4]  522 	di
+    000002DB 3Ar00r00         [13]  523 	ld	a, (_shadow_VDP_RSCY+0)
+    000002DE D3 BF            [11]  524 	out	(_VDP_CMD), a
+    000002E0 3E 89            [ 7]  525 	ld	a, #0x89
+    000002E2 D3 BF            [11]  526 	out	(_VDP_CMD), a
+    000002E4 FB               [ 4]  527 	ei
+                                    528 ;smoketest.c:78: scroll_bkg(-1, 0);
+    000002E5 18 2B            [12]  529 	jr	00151$
+    000002E7                        530 00150$:
+                                    531 ;smoketest.c:79: } else if (joy.joy1 & J_RIGHT) {
+    000002E7 CB 5B            [ 8]  532 	bit	3, e
+    000002E9 28 27            [12]  533 	jr	Z, 00151$
+                                    534 ;c:\gamedev\gbdk\include\sms\sms.h:228: __WRITE_VDP_REG(VDP_RSCX, __READ_VDP_REG(VDP_RSCX) - x);
+    000002EB 21r00r00         [10]  535 	ld	hl, #_shadow_VDP_RSCX
+    000002EE 79               [ 4]  536 	ld	a, c
+    000002EF C6 FF            [ 7]  537 	add	a, #0xff
+    000002F1 77               [ 7]  538 	ld	(hl), a
+    000002F2 F3               [ 4]  539 	di
+    000002F3 3Ar00r00         [13]  540 	ld	a, (_shadow_VDP_RSCX+0)
+    000002F6 D3 BF            [11]  541 	out	(_VDP_CMD), a
+    000002F8 3E 88            [ 7]  542 	ld	a, #0x88
+    000002FA D3 BF            [11]  543 	out	(_VDP_CMD), a
+    000002FC FB               [ 4]  544 	ei
+                                    545 ;c:\gamedev\gbdk\include\sms\sms.h:229: int16_t tmp = __READ_VDP_REG(VDP_RSCY) + y;
+                                    546 ;c:\gamedev\gbdk\include\sms\sms.h:230: __WRITE_VDP_REG(VDP_RSCY, (tmp < 0) ? 224 + tmp : tmp % 224u);
+    000002FD 2E E0            [ 7]  547 	ld	l, #0xe0
+                                    548 ;	spillPairReg hl
+                                    549 ;	spillPairReg hl
+    000002FF 7A               [ 4]  550 	ld	a, d
+    00000300 CDr00r00         [17]  551 	call	__moduchar
+    00000303 7B               [ 4]  552 	ld	a, e
+    00000304 32r00r00         [13]  553 	ld	(_shadow_VDP_RSCY+0), a
+    00000307 F3               [ 4]  554 	di
+    00000308 3Ar00r00         [13]  555 	ld	a, (_shadow_VDP_RSCY+0)
+    0000030B D3 BF            [11]  556 	out	(_VDP_CMD), a
+    0000030D 3E 89            [ 7]  557 	ld	a, #0x89
+    0000030F D3 BF            [11]  558 	out	(_VDP_CMD), a
+    00000311 FB               [ 4]  559 	ei
+                                    560 ;smoketest.c:80: scroll_bkg(1, 0);
+    00000312                        561 00151$:
+                                    562 ;smoketest.c:82: if (joy.joy1 & J_UP) {
+    00000312 21r02r00         [10]  563 	ld	hl, #(_joy + 2)
+    00000315 7E               [ 7]  564 	ld	a, (hl)
+    00000316 DD 77 FC         [19]  565 	ld	-4 (ix), a
+                                    566 ;c:\gamedev\gbdk\include\sms\sms.h:228: __WRITE_VDP_REG(VDP_RSCX, __READ_VDP_REG(VDP_RSCX) - x);
+    00000319 3Ar00r00         [13]  567 	ld	a, (_shadow_VDP_RSCX+0)
+    0000031C DD 77 FD         [19]  568 	ld	-3 (ix), a
+                                    569 ;c:\gamedev\gbdk\include\sms\sms.h:229: int16_t tmp = __READ_VDP_REG(VDP_RSCY) + y;
+    0000031F 3Ar00r00         [13]  570 	ld	a, (_shadow_VDP_RSCY+0)
+    00000322 DD 77 FE         [19]  571 	ld	-2 (ix), a
+    00000325 DD 36 FF 00      [19]  572 	ld	-1 (ix), #0x00
+                                    573 ;smoketest.c:82: if (joy.joy1 & J_UP) {
+    00000329 DD CB FC 46      [20]  574 	bit	0, -4 (ix)
+    0000032D 28 46            [12]  575 	jr	Z, 00155$
+                                    576 ;c:\gamedev\gbdk\include\sms\sms.h:228: __WRITE_VDP_REG(VDP_RSCX, __READ_VDP_REG(VDP_RSCX) - x);
+    0000032F DD 7E FD         [19]  577 	ld	a, -3 (ix)
+    00000332 32r00r00         [13]  578 	ld	(_shadow_VDP_RSCX+0), a
+    00000335 F3               [ 4]  579 	di
+    00000336 3Ar00r00         [13]  580 	ld	a, (_shadow_VDP_RSCX+0)
+    00000339 D3 BF            [11]  581 	out	(_VDP_CMD), a
+    0000033B 3E 88            [ 7]  582 	ld	a, #0x88
+    0000033D D3 BF            [11]  583 	out	(_VDP_CMD), a
+    0000033F FB               [ 4]  584 	ei
+                                    585 ;c:\gamedev\gbdk\include\sms\sms.h:229: int16_t tmp = __READ_VDP_REG(VDP_RSCY) + y;
+    00000340 DD 7E FE         [19]  586 	ld	a, -2 (ix)
+    00000343 C6 FF            [ 7]  587 	add	a, #0xff
+    00000345 5F               [ 4]  588 	ld	e, a
+    00000346 3E 00            [ 7]  589 	ld	a, #0x00
+    00000348 CE FF            [ 7]  590 	adc	a, #0xff
+    0000034A 57               [ 4]  591 	ld	d, a
+                                    592 ;c:\gamedev\gbdk\include\sms\sms.h:230: __WRITE_VDP_REG(VDP_RSCY, (tmp < 0) ? 224 + tmp : tmp % 224u);
+    0000034B 4B               [ 4]  593 	ld	c, e
+    0000034C 42               [ 4]  594 	ld	b, d
+    0000034D CB 78            [ 8]  595 	bit	7, b
+    0000034F 28 09            [12]  596 	jr	Z, 00182$
+    00000351 7B               [ 4]  597 	ld	a, e
+    00000352 C6 E0            [ 7]  598 	add	a, #0xe0
+    00000354 5F               [ 4]  599 	ld	e, a
+    00000355 07               [ 4]  600 	rlca
+    00000356 9F               [ 4]  601 	sbc	a, a
+    00000357 57               [ 4]  602 	ld	d, a
+    00000358 18 07            [12]  603 	jr	00183$
+    0000035A                        604 00182$:
+    0000035A EB               [ 4]  605 	ex	de, hl
+    0000035B 11 E0 00         [10]  606 	ld	de, #0x00e0
+    0000035E CDr00r00         [17]  607 	call	__moduint
+    00000361                        608 00183$:
+    00000361 FD 21r00r00      [14]  609 	ld	iy, #_shadow_VDP_RSCY
+    00000365 FD 73 00         [19]  610 	ld	0 (iy), e
+    00000368 F3               [ 4]  611 	di
+    00000369 3Ar00r00         [13]  612 	ld	a, (_shadow_VDP_RSCY+0)
+    0000036C D3 BF            [11]  613 	out	(_VDP_CMD), a
+    0000036E 3E 89            [ 7]  614 	ld	a, #0x89
+    00000370 D3 BF            [11]  615 	out	(_VDP_CMD), a
+    00000372 FB               [ 4]  616 	ei
+                                    617 ;smoketest.c:83: scroll_bkg(0, -1);
+    00000373 18 34            [12]  618 	jr	00156$
+    00000375                        619 00155$:
+                                    620 ;smoketest.c:84: } else if (joy.joy1 & J_DOWN) {
+    00000375 DD CB FC 4E      [20]  621 	bit	1, -4 (ix)
+    00000379 28 2E            [12]  622 	jr	Z, 00156$
+                                    623 ;c:\gamedev\gbdk\include\sms\sms.h:228: __WRITE_VDP_REG(VDP_RSCX, __READ_VDP_REG(VDP_RSCX) - x);
+    0000037B DD 7E FD         [19]  624 	ld	a, -3 (ix)
+    0000037E 32r00r00         [13]  625 	ld	(_shadow_VDP_RSCX+0), a
+    00000381 F3               [ 4]  626 	di
+    00000382 3Ar00r00         [13]  627 	ld	a, (_shadow_VDP_RSCX+0)
+    00000385 D3 BF            [11]  628 	out	(_VDP_CMD), a
+    00000387 3E 88            [ 7]  629 	ld	a, #0x88
+    00000389 D3 BF            [11]  630 	out	(_VDP_CMD), a
+    0000038B FB               [ 4]  631 	ei
+                                    632 ;c:\gamedev\gbdk\include\sms\sms.h:229: int16_t tmp = __READ_VDP_REG(VDP_RSCY) + y;
+    0000038C D1               [10]  633 	pop	de
+    0000038D E1               [10]  634 	pop	hl
+    0000038E E5               [11]  635 	push	hl
+    0000038F 23               [ 6]  636 	inc	hl
+    00000390 D5               [11]  637 	push	de
+                                    638 ;c:\gamedev\gbdk\include\sms\sms.h:230: __WRITE_VDP_REG(VDP_RSCY, (tmp < 0) ? 224 + tmp : tmp % 224u);
+    00000391 11 E0 00         [10]  639 	ld	de, #0x00e0
+    00000394 CDr00r00         [17]  640 	call	__moduint
+    00000397 FD 21r00r00      [14]  641 	ld	iy, #_shadow_VDP_RSCY
+    0000039B FD 73 00         [19]  642 	ld	0 (iy), e
+    0000039E F3               [ 4]  643 	di
+    0000039F 3Ar00r00         [13]  644 	ld	a, (_shadow_VDP_RSCY+0)
+    000003A2 D3 BF            [11]  645 	out	(_VDP_CMD), a
+    000003A4 3E 89            [ 7]  646 	ld	a, #0x89
+    000003A6 D3 BF            [11]  647 	out	(_VDP_CMD), a
+    000003A8 FB               [ 4]  648 	ei
+                                    649 ;smoketest.c:85: scroll_bkg(0, 1);
+    000003A9                        650 00156$:
+                                    651 ;smoketest.c:88: vsync();
+    000003A9 CDr00r00         [17]  652 	call	_vsync
+                                    653 ;smoketest.c:90: }
+    000003AC C3rDEr00         [10]  654 	jp	00158$
+    000003AF                        655 _tilemap:
+    000003AF 02                     656 	.db #0x02	; 2
+    000003B0 04                     657 	.db #0x04	; 4
+    000003B1 06                     658 	.db #0x06	; 6
+    000003B2 08                     659 	.db #0x08	; 8
+    000003B3 03                     660 	.db #0x03	; 3
+    000003B4 05                     661 	.db #0x05	; 5
+    000003B5 07                     662 	.db #0x07	; 7
+    000003B6 09                     663 	.db #0x09	; 9
+    000003B7                        664 _tilemapw:
+    000003B7 02 00                  665 	.dw #0x0002
+    000003B9 04 00                  666 	.dw #0x0004
+    000003BB 06 00                  667 	.dw #0x0006
+    000003BD 08 00                  668 	.dw #0x0008
+    000003BF 03 00                  669 	.dw #0x0003
+    000003C1 05 00                  670 	.dw #0x0005
+    000003C3 07 00                  671 	.dw #0x0007
+    000003C5 09 00                  672 	.dw #0x0009
+                                    673 	.area _CODE
+                                    674 	.area _INITIALIZER
+    00000000                        675 __xinit__x:
+    00000000 80 00                  676 	.dw #0x0080
+    00000002                        677 __xinit__y:
+    00000002 00 00                  678 	.dw #0x0000
+    00000004                        679 __xinit__xspd:
+    00000004 00                     680 	.db #0x00	;  0
+    00000005                        681 __xinit__yspd:
+    00000005 00                     682 	.db #0x00	;  0
+    00000006                        683 __xinit__anim:
+    00000006 00                     684 	.db #0x00	; 0
+    00000007                        685 __xinit__tick:
+    00000007 00                     686 	.db #0x00	; 0
+                                    687 	.area _CABS (ABS)

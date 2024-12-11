@@ -1,0 +1,65 @@
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180 / ZX-Next / eZ80 / R800)                          Page 1
+Hexadecimal [32-Bits]
+
+Symbol Table
+
+    .__.$$$.                                                    =   00002710 L
+    .__.ABS.                                                    =   00000000 G
+    .__.CPU.                                                    =   00000000 L
+    .__.H$L.                                                    =   00000000 L
+    _AUDIOCTRL                                                  =   000000F2 
+    _FMADDRESS                                                  =   000000F0 
+    _FMDATA                                                     =   000000F1 
+    _GG_EXT_7BIT                                                =   00000001 
+    _GG_EXT_CTL                                                 =   00000002 
+    _GG_SIO_CTL                                                 =   00000005 
+    _GG_SIO_RECV                                                =   00000004 
+    _GG_SIO_SEND                                                =   00000003 
+    _GG_SOUND_PAN                                               =   00000006 
+    _GG_STATE                                                   =   00000000 
+    _GLASSES_3D                                                 =   0000FFF8 
+    _HCOUNTER                                                   =   0000007F 
+    _JOY_CTL                                                    =   0000003F 
+    _JOY_PORT1                                                  =   000000DC 
+    _JOY_PORT2                                                  =   000000DD 
+    _MAP_FRAME0                                                 =   0000FFFD 
+    _MAP_FRAME1                                                 =   0000FFFE 
+    _MAP_FRAME2                                                 =   0000FFFF 
+    _MEMORY_CTL                                                 =   0000003E 
+    _PSG                                                        =   0000007F 
+    _RAM_CONTROL                                                =   0000FFFC 
+    _VCOUNTER                                                   =   0000007E 
+    _VDP_CMD                                                    =   000000BF 
+    _VDP_DATA                                                   =   000000BE 
+    _VDP_STATUS                                                 =   000000BF 
+    ___bank_cowbell_8bit_pcm_unsigned                               ******** GX
+    ___bank_risset_drum_8bit_pcm_unsigned                           ******** GX
+  0 ___str_0                                                        00000065 R
+  7 __xinit__joy                                                    00000000 R
+    _cowbell_8bit_pcm_unsigned                                      ******** GX
+    _cut_sample                                                     ******** GX
+  2 _joy                                                            00000000 GR
+    _joypad                                                         ******** GX
+  0 _main                                                           00000000 GR
+  1 _old_joy                                                        00000000 GR
+    _play_sample                                                    ******** GX
+    _puts                                                           ******** GX
+    _risset_drum_8bit_pcm_unsigned                                  ******** GX
+    _vsync                                                          ******** GX
+
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180 / ZX-Next / eZ80 / R800)                          Page 2
+Hexadecimal [32-Bits]
+
+Area Table
+
+   0 _CODE                                      size       78   flags    0
+   1 _DATA                                      size        1   flags    0
+   2 _INITIALIZED                               size        1   flags    0
+   3 _DABS                                      size        0   flags    8
+   4 _HOME                                      size        0   flags    0
+   5 _GSINIT                                    size        0   flags    0
+   6 _GSFINAL                                   size        0   flags    0
+   7 _INITIALIZER                               size        1   flags    0
+   8 _CABS                                      size        0   flags    8
+

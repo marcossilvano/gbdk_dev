@@ -1,0 +1,17 @@
+{
+    "files.associations": {
+        "sms.h": "c",
+        "tiles_data.h": "c",
+        "utils.h": "c",
+        "stdlib.h": "c",
+        "rand.h": "c",
+        "stdio.h": "c",
+        "version.h": "c",
+        "hardware.h": "c",
+        "map.h": "c",
+        "gameobject.h": "c",
+        "spr_player.h": "c",
+        "tiles_map1.h": "c",
+        "type_traits": "c"
+    }
+}

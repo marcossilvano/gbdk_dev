@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "sms.h": "c",
+        "tiles_data.h": "c",
+        "utils.h": "c",
+        "stdlib.h": "c"
+    }
+}

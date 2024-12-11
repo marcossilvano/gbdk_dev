@@ -1,0 +1,33 @@
+{
+  "name": "gameboy-palettes",
+  "displayName": "Gameboy Palettes",
+  "description": "Gameboy and Gameboy Color Palettes",
+  "version": "1.0",
+  "publisher": "Dark Fox. Twitter: @darkfox6302",
+  "categories": [
+    "Palettes"
+  ],
+  "contributes": {
+    "palettes": [
+      { "id": "Gameboy DMG-01 High Contrast",             "path": "./dmg-hc.gpl" },
+      { "id": "Gameboy DMG-01 Medium Contrast",           "path": "./dmg-mc.gpl" },
+      { "id": "Gameboy DMG-01 Low Contrast",              "path": "./dmg-lc.gpl" },
+	  { "id": "Gameboy Pocket MGB-001 (Black & White)",   "path": "./mgb-001.gpl" },
+	  { "id": "Gameboy Color CGB-001 Brown",              "path": "./cgb-brown.gpl" },
+	  { "id": "Gameboy Color CGB-001 Pastel",             "path": "./cgb-pastel.gpl" },
+	  { "id": "Gameboy Color CGB-001 Blue",               "path": "./cgb-blue.gpl" },
+	  { "id": "Gameboy Color CGB-001 Green",              "path": "./cgb-green.gpl" },
+	  { "id": "Gameboy Color CGB-001 Red",                "path": "./cgb-red.gpl" },
+	  { "id": "Gameboy Color CGB-001 Orange",             "path": "./cgb-orange.gpl" },
+	  { "id": "Gameboy Color CGB-001 Dark Blue",          "path": "./cgb-dblue.gpl" },
+	  { "id": "Gameboy Color CGB-001 Dark Green",         "path": "./cgb-dgreen.gpl" },
+	  { "id": "Gameboy Color CGB-001 Dark Brown",         "path": "./cgb-dbrown.gpl" },
+	  { "id": "Gameboy Color CGB-001 Yellow",             "path": "./cgb-yellow.gpl" },
+	  { "id": "Gameboy Color CGB-001 Grayscale",          "path": "./cgb-gscale.gpl" },
+	  { "id": "Gameboy Color CGB-001 Inverted",           "path": "./cgb-inverted.gpl" },
+	  { "id": "Gameboy Color CGB-001 All Palettes",       "path": "./cgb-all.gpl" },
+	  { "id": "Gameboy All Palettes",                     "path": "./gb-all.gpl" }
+	  
+    ]
+  }
+}
