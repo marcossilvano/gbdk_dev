@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include "utils.h"
 #include "tiles_data.h"
+#include "assets/tile_water.h"
 
 #define TILEIDX_FISH_FRAME1 20
 #define TILEIDX_FISH_FRAME2 TILEIDX_FISH_FRAME1 + 4
@@ -35,17 +36,20 @@ void main(void) {
     u8 count = 0, frame = TILEIDX_BAT_FRAME1, delay = 10;
 
 
-    set_tiledata(TILES1_BANK, TILES1_COUNT, tiles1_data);
-    // tile 0 is always for background and tiles 1, for sprites
-    set_tilepal(0, 16, tiles1_palette); 
+    // set_tiledata(TILES1_BANK, TILES1_COUNT, tiles1_data);
+    set_tiledata(0, 1, tile_water_data);
+
+    // palette 0 = background
+    // palette 1 = sprites
+    set_tilepal(0, 16, tile_water_palette); 
 
     DISPLAY_ON;
     SHOW_BKG;
 
-    set_tile(0, 0, 1);
+    // set_tile(0, 0, 1);
     // set_tile2x2(5, 5, TILEIDX_FISH_FRAME1);
     // set_tile2x2(7, 7, TILEIDX_FISH_FRAME2);
-    set_tile2x2(x, y, TILEIDX_BAT_FRAME1);
+    // set_tile2x2(x, y, TILEIDX_BAT_FRAME1);
 
     while (1) {
         update();
