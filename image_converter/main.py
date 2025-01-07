@@ -11,9 +11,9 @@ import converter
 config: dict ={
     'destination': 'dest folder',
     'auto convert': False,
-    'png files': [
-        'file 1', 'file 2'
-    ]
+    'png files': [ 
+        # ListItem... 
+        ]
 }
 
 # LIST BOX ITEM ####################################
@@ -31,6 +31,10 @@ class ListItem:
     
     def __eq__(self, value):
         return value == self.filepath
+
+    def print(self):
+        print('{', self.filepath, self.frame_width, self.frame_height, self.mode8x16, '}')
+
 
 # GLOBAL ACCESS TO KEY WIDGETS #####################
 count: int = 0
@@ -80,6 +84,11 @@ def find_listbox(name: str, listbox: Listbox) -> bool:
     return True
 
 
+def list_add_all(items: list[ListItem]) -> None:
+    for item in listitems:
+        list_add(item)
+
+
 def list_add(item: ListItem):
     global listbox, listitems
     listbox.insert(END, item)
@@ -104,14 +113,18 @@ def add_item(item: str):
         listbox.see(END)
 
 
-def on_destfolder_button_click(entry: Entry) -> str:
-    # Tk().withdraw()                 # we don't want a full GUI, so keep the root window from appearing
-    # dirname = filedialog.askopenfilename()
-    dirname = filedialog.askdirectory()
+def set_destfolder(entry: Entry, dirname: str) -> None:
     if dirname:
         entry.delete(0, END)
         entry.insert(0, dirname)
         entry.focus()
+
+
+def on_destfolder_button_click(entry: Entry) -> str:
+    # Tk().withdraw()                 # we don't want a full GUI, so keep the root window from appearing
+    # dirname = filedialog.askopenfilename()
+    dirname = filedialog.askdirectory()
+    set_destfolder(entry, dirname)
 
 
 def on_srcfolder_button_click() -> None:
@@ -357,26 +370,40 @@ def create_log_frame(root, row=0, col=0) -> None:
 
 def load_config(config_file: str) -> None:
     if not os.path.exists(config_file):
+        log_info("JSON config file not found. Previous files not loaded.\n")
         return
     
     file = open(config_file, 'r')    
     text: str = file.read()
-    
-    global config
+
+    global config, listitems
     try:
         config = json.loads(text)
     except:
-        log_error("Could not parse JSON config file")
+        log_error("Could not parse JSON config file.\n")
         file.close()
         return
+
+    # fill GUI widgets here
+    set_destfolder(entry_dest, config['destination'])
+    for item in config['png files']:
+        list_add(ListItem(item['filepath'], item['frame_width'], item['frame_height'], item['mode8x16']))
     
-    log_info("JSON config file loaded")
+    log_info("JSON config file loaded.\n")
     # print(text)
     file.close()
 
 
+def to_json(obj) -> str:
+    return json.dumps(obj, default=lambda obj: obj.__dict__)
+
+
 def save_config(config_file: str) -> None:
     global config
+
+    # fill all config here
+    config['destination'] = entry_dest.get()
+    config['png files'] = listitems
 
     try:
         file = open(config_file, 'w')
@@ -384,7 +411,8 @@ def save_config(config_file: str) -> None:
     except:
         log_error("Could not create config file")
 
-    json.dump(config, file)
+    file.write(to_json(config))
+    # json.dump(config, file)
     file.close()
 
 
@@ -394,7 +422,6 @@ def close_and_save(root) -> None:
 
 
 def main():
-
     root = Tk()
     root.title("PNG to SMS converter v0.1")
     root.minsize(1000,600)

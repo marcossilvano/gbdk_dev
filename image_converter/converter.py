@@ -25,7 +25,7 @@ def open_and_check(filepath: str, frame_width: int, frame_height: int):
         log("[ERROR]", 'Image must have indexed color mode: %s' % filepath)
         return [False, image]
 
-    log("[INFO]", 'Palette size: %d for %s' % (len(image.palette.colors), filepath))
+    log("[INFO]", 'Found %d colors in: %s' % (len(image.palette.colors), filepath))
     if len(image.palette.colors) != 16:
         log("[ERROR]", 'Palette must have 16 colors: %s' % filepath)
         return [False, image]
@@ -62,9 +62,11 @@ def is_multiple_of_85(color: tuple[int, int, int]) -> bool:
     return not(color[0] % 85 != 0 or color[1] % 85 != 0 or color[2] % 85 != 0)
 
 
-def write_palette(file_c: TextIOWrapper, palette: list, obj_name: str) -> bool:   
+def write_palette(file_c: TextIOWrapper, palette: list, obj_name: str, number_of_tiles: int) -> bool:   
     content: str = '''
 #include "%s.h"
+
+const uint8_t %s_number_of_tiles = %d;
 
 // 16 color palette
 const uint8_t const %s_palette[] =
@@ -94,18 +96,41 @@ const uint8_t const %s_palette[] =
         sms_palette.append('0x%02X' % BBGGRR)
 
     palette_str: str = build_str_from_data(sms_palette, 8)
-    content = content % (obj_name, obj_name, palette_str[:-1])
+    content = content % (
+        obj_name,                   # include .h
+        obj_name, number_of_tiles,  # number of tiles
+        obj_name, palette_str[:-1]  # palette array
+        )
     try:
         file_c.write(content)
     except:
         log('[ERROR]', 'Cannot write header file')
         return False
-
+    
     # idx: int = 1
     # for color in palette:
     #     print(idx, color)
     #     idx += 1
     return True
+
+
+def get_tile_data(pixels, pos_x: int, pos_y: int):
+    print("Tile data:")
+    sms_pixels: list[str] = []
+    for y in range(pos_y, pos_y+8):
+        for shift in range(4):
+            px: int = 0
+            for i in range(8):
+                print((pixels[pos_x+i,y]) & (0x01 << shift), end='')
+                bit = ((pixels[pos_x+i,y]) & (0x01 << shift)) != 0
+                px = px | (bit << (7-i))
+            sms_pixels.append('0x%02X' % px)
+            print(' ', end='')
+            # print(sms_pixels[-1], end=' ')
+        print()
+
+    return sms_pixels
+
 
 
 def write_tiles(file_c: TextIOWrapper, image: ImageFile, obj_name: str, 
@@ -116,26 +141,23 @@ const uint8_t const %s_data[] =
 };
 '''
     pixels = image.load()
-    sms_pixels: list[str] = []
     data_str: str = ''
     for frm_y in range(image.height//frame_height):
         for frm_x in range(image.width//frame_width):
             pos_x = frm_x*frame_width
             pos_y = frm_y*frame_height
 
-            for y in range(pos_y, pos_y+8):
-                for x in range(pos_x, pos_x+8, 2):
-                    px: int = 0
-                    px = (pixels[x,y]-1) << 4
-                    px += (pixels[x+1,y]-1)
-
-                    # print('0x%X%X' % (pixels[x,y]-1, pixels[x+1,y]-1), end=', ')
-                    sms_pixels.append('0x%02X' % px)
-                # print()
-            # print()
+            sms_pixels: list[str] = get_tile_data(pixels, pos_y, pos_x)
 
             data_str += build_str_from_data(sms_pixels, frame_width//2) + '\n'
             sms_pixels = []
+    
+    print("\nImage pixels: ")
+    for y in range(pos_y, pos_y+8):
+        for x in range(pos_x, pos_x+8):
+            print('%02X' % (pixels[x,y]), end=', ')
+        print()
+    print()
 
     content = content % (obj_name, data_str[:-2])
     try:
@@ -152,12 +174,14 @@ const uint8_t const %s_data[] =
     return True
 
 
-def write_header_file(file_h: TextIOWrapper, obj_name: str) -> None:
+def write_header_file(file_h: TextIOWrapper, obj_name: str) -> bool:
     content: str = '''
 #ifndef TILES_%s_H
 #define TILES_%s_H
 
 #include <sms/sms.h>
+
+extern const uint8_t %s_number_of_tiles;
 
 extern const uint8_t const %s_palette[];
 extern const uint8_t const %s_data[];
@@ -165,10 +189,15 @@ extern const uint8_t const %s_data[];
 #endif'''
 
     try:
-        file_h.write(content % (obj_name.upper(), obj_name.upper(), obj_name, obj_name))
+        file_h.write(content % (
+            obj_name.upper(), obj_name.upper(), # include guard
+            obj_name,                           # number of tiles
+            obj_name, obj_name))                # variable names
     except:
         log('[ERROR]', 'Cannot write header file')
-
+        return False
+    
+    return True
 
 def png_to_array(destfolder: str, filepath: str, frame_width: int, 
                  frame_height: int, mode8x16: bool, log_func) -> bool:
@@ -181,18 +210,28 @@ def png_to_array(destfolder: str, filepath: str, frame_width: int,
         return False
     
     new_name: str = extract_filename(filepath)
+    new_path: str = destfolder + '/' + new_name
         
     file_h: TextIOWrapper = create_array_file(destfolder, new_name + '.h')
-    write_header_file(file_h, new_name)
+    number_of_tiles: int = image.width/8 * image.height/8
+    if not write_header_file(file_h, new_name):
+        return False
+    
+    log('[INFO]', 'Header file generated: \'%s.h\'' % (new_path))
     file_h.close()
 
     file_c: TextIOWrapper = create_array_file(destfolder, new_name + '.c')
-    if not write_palette(file_c, image.palette.colors.keys(), new_name):
-        return    
+    if not write_palette(file_c, image.palette.colors.keys(), new_name, number_of_tiles):
+        return False
+    
+    log('[INFO]', '16 colors written into: \'%s.c\'' % new_path)
+
     if not write_tiles(file_c, image, new_name, frame_width, frame_height, mode8x16):
-        return
+        return False
+
+    log('[INFO]', '%d tiles written into: \'%s.c\'' % (image.width/8 * image.height/8, new_path))
     file_c.close()
 
-    log('[INFO]', "Image successfully converted: %s" % filepath)
+    log('[INFO]', "Image successfully converted\n")
     image.close()
     return True
