@@ -1,3 +1,14 @@
+'''
+---------------------------------------------------------------
+PNG TO MASTER SYSTEM CONVERTER
+---------------------------------------------------------------
+
+Run VENV activation script:
+    & C:/gbdk_dev/sms_image_converter/venv/Scripts/Activate.ps1
+
+
+'''
+
 from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog

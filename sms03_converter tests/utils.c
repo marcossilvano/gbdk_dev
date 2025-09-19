@@ -42,7 +42,7 @@ bool is_bitset(u8 value, u8 bit) {
     return ((value & bit) == bit);
 }
 
-void update(void) {
+void key_update(void) {
     // update joypad input
     buttons_old = buttons;
     buttons = joypad();

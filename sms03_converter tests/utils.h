@@ -22,7 +22,7 @@ void set_tile(u8 x, u8 y, u8 tile);
 void set_tile2x2(u8 x, u8 y, u8 tilestart); // sets 16x16 metatile (4 tiles length)
 
 bool is_bitset(u8 value, u8 bit);
-void update(void);
+void key_update(void);
 
 bool key_down(u8 key);
 bool key_pressed(u8 key);

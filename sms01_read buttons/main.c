@@ -7,6 +7,7 @@
  */
 
 #include <sms/sms.h>
+#include <gbdk/emu_debug.h>
 #include <stdio.h>
 
 #define PRINT_BUTTON(BTN) { \
@@ -21,6 +22,8 @@ void main() {
     uint8_t buttons;
 
     printf("Master System Programming!\n\nPress any button:\n");
+
+    EMU_TEXT("Hello");
 
     while (1) {
         buttons = joypad();

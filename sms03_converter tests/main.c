@@ -85,7 +85,7 @@ void main(void) {
     // set_tile2x2(x, y, TILEIDX_BAT_FRAME1);
 
     while (1) {
-        update();
+        key_update();
 
         if (!--delay) {
             delay = 3;

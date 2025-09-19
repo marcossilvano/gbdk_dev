@@ -26,8 +26,8 @@ def open_and_check(filepath: str, frame_width: int, frame_height: int):
         return [False, image]
 
     log("[INFO]", 'Found %d colors in: %s' % (len(image.palette.colors), filepath))
-    if len(image.palette.colors) != 16:
-        log("[ERROR]", 'Palette must have 16 colors: %s' % filepath)
+    if len(image.palette.colors) > 16:
+        log("[ERROR]", 'Palette must have 16 colors at most: %s' % filepath)
         return [False, image]
     
     return True, image
@@ -86,6 +86,7 @@ const uint8_t const %s_palette[] =
     sms_palette: list[str] = []
     for color in palette:
         if not is_multiple_of_85(color):
+            # round to multiple of 85?
             log('[ERROR]', 'Color %d: RGB must be multiple of 85' % color)        
             return False
 

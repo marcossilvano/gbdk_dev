@@ -112,7 +112,7 @@ void main(void) {
         vsync();
         __WRITE_VDP_REG(VDP_R0, __READ_VDP_REG(VDP_R0) &= ~R0_IE1);
 
-        // EMU_TEXT("loop");
+        EMU_TEXT("loop");
 
         update_keys();      
         // scroll_bkg(-1,0);
