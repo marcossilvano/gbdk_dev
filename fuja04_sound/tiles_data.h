@@ -5,7 +5,7 @@
 #include <stdbool.h>
 
 #define BKG_TILES_COUNT 21
-#define SPR_TILES_COUNT 4*14
+#define SPR_TILES_COUNT 2*30
 #define TITLE_TILES_COUNT 28
 
 #define TITLE_WIDH   25

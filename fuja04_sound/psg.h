@@ -69,29 +69,6 @@ Inlining and Constant Propagation:
   with 0x01A9 immediately.
 */
 
-// static const u16 const notes[]=
-// {
-//                                                                0x03F9,0x03C0,0x038A, //octave 0
-// 0x0353,0x0323,0x02F6,0x02CB,0x02A3,0x027D,0x0259,0x0238,0x0218,0x01FA,0x01DD,0x01C2, //octave 1
-// 0x01A9,0x0191,0x017B,0x0165,0x0151,0x013E,0x012D,0x011C,0x010C,0x00FD,0x00EF,0x00E1, //octave 2
-// 0x00D4,0x00C8,0x00BD,0x00B2,0x00A8,0x009F,0x0097,0x008E,0x0086,0x007F,0x0078,0x0070, //octave 3
-// 0x006A,0x0064,0x005E,0x0059,0x0054,0x0050,0x004C,0x0047,0x0043,0x0040,0x003C,0x0038, //octave 4
-// 0x0035,0x0032,0x002F,0x002D,0x002A,0x0028,0x0026,0x0024,0x0022,0x0020,0x001E,0x001C, //octave 5
-// 0x001A,0x0019,0x0018,0x0017,0x0016,0x0015,0x0013,0x0012,0x0011,0x0010,0x000F,0x000E  //octave 6
-// };
-
-// enum NotesLabels
-// {
-//                                           A0, As0, B0,
-//   C1, Cs1, D1, Ds1, E1, F1, Fs1, G1, Gs1, A1, As1, B1,
-//   C2, Cs2, D2, Ds2, E2, F2, Fs2, G2, Gs2, A2, As2, B2,
-//   C3, Cs3, D3, Ds3, E3, F3, Fs3, G3, Gs3, A3, As3, B3,
-//   C4, Cs4, D4, Ds4, E4, F4, Fs4, G4, Gs4, A4, As4, B4,
-//   C5, Cs5, D5, Ds5, E5, F5, Fs5, G5, Gs5, A5, As5, B5,
-//   C6, Cs6, D6, Ds6, E6, F6, Fs6, G6, Gs6, A6, As6, B6,
-//   END
-// };
-
 enum NotesLabels {
   /* Octave 0 */
   A0 = 0x03F9, As0 = 0x03C0, B0 = 0x038A,
@@ -416,11 +393,83 @@ static const u8 const MUSIC_INTRO[] = {
   LOOP
 };
 
-static const u8 const SOUNDFX_ITEM[] = {
-  NOTE(F3, VOL_MAX, 0), 
-  NOTE(G3, VOL_MAX, 0), 
-  NOTE(A3, VOL_MAX, 0), 
-  NOTE(B3, VOL_MAX, 0), 
+// SOUND FX ////////////////////////////////////////////////////////////////////
+
+static const u8 const SOUNDFX_BAT_BOUNCE[] = {
+  NOTE(A0, 0x03, 2), 
+  NOTE(A0, 0x03, 2), 
+  NOTE(A1, 0x03, 2), 
+  NOTE(A1, 0x03, 2), 
+  END
+};
+
+static const u8 const SOUNDFX_BAT_APPEAR[] = {
+  NOTE(A0, VOL_75, 1), 
+  NOTE(A1, VOL_75, 1), 
+  NOTE(A0, VOL_75, 1), 
+
+  NOTE(F1, VOL_MUTE, 1), 
+  NOTE(F1, VOL_MUTE, 1), 
+  NOTE(F1, VOL_MUTE, 1), 
+  
+  NOTE(C1, VOL_75, 1), 
+  NOTE(C2, VOL_75, 1), 
+  NOTE(C1, VOL_75, 1), 
+
+  NOTE(F1, VOL_MUTE, 1), 
+  NOTE(F1, VOL_MUTE, 1), 
+  NOTE(F1, VOL_MUTE, 1), 
+
+  LOOP
+};
+
+static const u8 const SOUNDFX_ITEM_50[] = {
+  NOTE(F1, VOL_MAX, 0), 
+  NOTE(F2, VOL_MAX, 0), 
+  NOTE(G1, VOL_MAX, 0), 
+  NOTE(G2, VOL_MAX, 0), 
+  NOTE(A1, VOL_MAX, 0), 
+  NOTE(A2, VOL_MAX, 0), 
+  END
+};
+
+static const u8 const SOUNDFX_ITEM_100[] = {
+  NOTE(G1, VOL_MAX, 0), 
+  NOTE(G2, VOL_MAX, 0), 
+  NOTE(A1, VOL_MAX, 0), 
+  NOTE(A2, VOL_MAX, 0), 
+  NOTE(B1, VOL_MAX, 0), 
+  NOTE(B2, VOL_MAX, 0), 
+  END
+};
+
+static const u8 const SOUNDFX_ITEM_200[] = {
+  NOTE(Gs1, VOL_MAX, 0), 
+  NOTE(Gs2, VOL_MAX, 0), 
+  NOTE(As1, VOL_MAX, 0), 
+  NOTE(As2, VOL_MAX, 0), 
+  NOTE(C2, VOL_MAX, 0), 
+  NOTE(C3, VOL_MAX, 0), 
+  END
+};
+
+static const u8 const SOUNDFX_ITEM_300[] = {
+  NOTE(C1, VOL_MAX, 0), 
+  NOTE(C2, VOL_MAX, 0), 
+  NOTE(B1, VOL_MAX, 0), 
+  NOTE(B2, VOL_MAX, 0), 
+  NOTE(D2, VOL_MAX, 0), 
+  NOTE(D3, VOL_MAX, 0), 
+  END
+};
+
+static const u8 const SOUNDFX_ITEM_500[] = {
+  NOTE(F3, 0x02, 0), 
+  NOTE(F4, 0x02, 0), 
+  NOTE(G3, 0x02, 0), 
+  NOTE(G4, 0x02, 0), 
+  NOTE(A3, 0x02, 0), 
+  NOTE(A4, 0x02, 0), 
   END
 };
 
@@ -434,7 +483,10 @@ extern void play_music(u8* pointer);
 extern void stop_music(void);
 extern void update_music(void);
 
+void volume_decay(void);
+
 extern void play_soundfx(u8* pointer);
+extern void stop_sound_fx(u8 channel);
 extern void update_soundfx(void);
 
 #endif

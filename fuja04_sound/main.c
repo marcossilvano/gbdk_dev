@@ -41,7 +41,7 @@
 #define BAT_SPEED     1
 #define BAT_MAX       32-3        // 32 metasprites - (player + item + jet)
 #define BAT_SAT_START 6           // initial SAT entry for balls
-#define BAT_TILE_IDX  0x28        // 8x8 idx in sprite png (4x 8x8)
+#define BAT_TILE_IDX  0x2C        // 8x8 idx in sprite png (4x 8x8)
 
 #define BAT_TYPE_1 1
 #define BAT_TYPE_2 2
@@ -57,11 +57,11 @@
 #define PLAYER_SAT      0           // fixed SAT entry (2x 8x16)
 #define PLAYER_TILE_IDX 0           // 8x8 idx in sprite png
 
-#define EXPLOSION_TILE_IDX 0x34
+#define EXPLOSION_TILE_IDX 0x38
 
-#define JET_BOOST_TILE_IDX 20        // 8x8 idx in sprite png
+#define JET_BOOST_TILE_IDX 20       // 8x8 idx in sprite png
 #define JET_SAT         2           // fixed SAT entry (2x 8x16)
-#define JET_TILE_IDX    16           // 8x8 idx in sprite png
+#define JET_TILE_IDX    16          // 8x8 idx in sprite png
 
 #define DIR_NONE  0
 #define DIR_LEFT  1
@@ -78,10 +78,16 @@
 #define GAMESTATE_DELAY_READY 200//41*4
 
 #define ITEM_FX_PAUSE 10
-#define ITEM_POINTS   50
+// #define ITEM_POINTS   50
 #define ITEM_SAT      4          // fixed SAT entry (2x 8x16)
-#define ITEM_TILE_IDX     0x18   // 8x8 idx in sprite png
-#define ITEM_PTS_TILE_IDX 0x20   // 8x8 idx in sprite png
+#define ITEM_TILE_IDX    0x18   // 8x8 idx in sprite png
+
+#define PTS_50_TILE_IDX  0x20   // 8x8 idx in sprite png
+#define PTS_100_TILE_IDX 0x22   
+#define PTS_200_TILE_IDX 0x24   
+#define PTS_300_TILE_IDX 0x26   
+#define PTS_500_TILE_IDX 0x28   
+#define PTS_0_TILE_IDX   0x2A   
 
 typedef struct {
     u8 left;
@@ -147,6 +153,7 @@ u16 score2;    // low word
 u16 highscore1;    
 u16 highscore2;
 u8 item_combo;
+u8 item_combo_5;
 u8 boost_color_counter;
 
 // VDP syncronization
@@ -614,7 +621,7 @@ void on_player_boost(GameObject* ply) {
     set_sprite_tile(JET_SAT, JET_BOOST_TILE_IDX);
     set_sprite_tile(JET_SAT+1, JET_BOOST_TILE_IDX+2);
 
-    set_volume(3, VOL_50);
+    set_volume(3, VOL_75);
     play_noise(NOISE_MODE_WHITE, NOISE_SHIFT_MEDIUM);
 }
 
@@ -846,6 +853,7 @@ void bat_state_appear(GameObject* bat) {
     
     --bat->state_counter;
     if (!bat->state_counter) {
+        stop_sound_fx(1);
         bat_change_state(bat, BAT_STATE_RUN, 1);
     }
 }
@@ -906,9 +914,8 @@ void bat_state_run(GameObject* bat) {
         } else {
             bat->visible = false;
             
-            // Do not update bat movement at every 30 fps.
-            // This helps to reduce bat speed without using
-            // fixed point math.
+            // Update at 15 fps, which helps to reduce bat 
+            // speed without using fixed point math.
             return;
         }
         // bat->visible = !bat->visible;
@@ -922,21 +929,25 @@ void bat_state_run(GameObject* bat) {
     if (bat->x < (ENTITY_HALF+SCREEN_LEFT)) {    // 8 = first column width (hidden)
         bat->x = (ENTITY_HALF+SCREEN_LEFT);
         bat->spx = -bat->spx;
+        play_soundfx(SOUNDFX_BAT_BOUNCE);
     } 
     else
     if (bat->x > SCREEN_WIDTH-ENTITY_HALF) {
         bat->x = (u8)(SCREEN_WIDTH-ENTITY_HALF);
         bat->spx = -bat->spx;
+        play_soundfx(SOUNDFX_BAT_BOUNCE);
     }
-
+    
     if (bat->y < (ENTITY_HALF+SCREEN_TOP)) {    // 8 = HUD height
         bat->y = (ENTITY_HALF+SCREEN_TOP);
         bat->spy = -bat->spy;
+        play_soundfx(SOUNDFX_BAT_BOUNCE);
     } 
     else
     if (bat->y > SCREEN_HEIGHT-ENTITY_HALF) {
         bat->y = (u8)(SCREEN_HEIGHT-ENTITY_HALF);
         bat->spy = -bat->spy;
+        play_soundfx(SOUNDFX_BAT_BOUNCE);
     }
 
     // animation
@@ -1055,7 +1066,7 @@ void item_state_disappear(GameObject* itm) {
     if (!itm->state_counter) {
         itm->visible = false;
         item_change_state(ITEM_STATE_WAIT, ITEM_DELAY_WAIT);
-        item_combo = false;
+        item_combo = 0;
     }
 }
 
@@ -1072,7 +1083,8 @@ void item_state_collected(GameObject* itm) {
     if (!itm->state_counter) {
         itm->visible = false;
         item_change_state(ITEM_STATE_WAIT, 1);
-        item_combo = true;
+        if (item_combo < 3)
+            item_combo += 1;
     }
 }
 
@@ -1080,18 +1092,40 @@ void collect_item(GameObject* itm) {
     item_change_state(ITEM_STATE_COLLECTED, ITEM_DELAY_SHOW_PTS);
     
     // change to POINTS sprite
-    if (item_combo) {
-        score2 += ITEM_POINTS*2;
-        set_sprite_tile(itm->sat_idx, ITEM_PTS_TILE_IDX+4);
-        set_sprite_tile(itm->sat_idx+1, ITEM_PTS_TILE_IDX+2+4);
-    } else {
-        score2 += ITEM_POINTS;
-        set_sprite_tile(itm->sat_idx, ITEM_PTS_TILE_IDX);
-        set_sprite_tile(itm->sat_idx+1, ITEM_PTS_TILE_IDX+2);
+    switch (item_combo) {
+        case 0: 
+            score2 += 50; 
+            set_sprite_tile(itm->sat_idx, PTS_50_TILE_IDX);
+            play_soundfx(SOUNDFX_ITEM_50);
+            break;
+        case 1: 
+            score2 += 100; 
+            set_sprite_tile(itm->sat_idx, PTS_100_TILE_IDX);
+            play_soundfx(SOUNDFX_ITEM_100);
+            break;
+        case 2: 
+            score2 += 200; 
+            set_sprite_tile(itm->sat_idx, PTS_200_TILE_IDX);
+            play_soundfx(SOUNDFX_ITEM_200);
+            break;
+        case 3: 
+            item_combo_5++;
+            if (item_combo_5 == 5) {
+                item_combo_5 = 0;
+                score2 += 900; 
+                set_sprite_tile(itm->sat_idx, PTS_500_TILE_IDX);
+                play_soundfx(SOUNDFX_ITEM_500);
+            } else {
+                score2 += 300; 
+                set_sprite_tile(itm->sat_idx, PTS_300_TILE_IDX);
+                play_soundfx(SOUNDFX_ITEM_300);
+            }
+            break;
     }
+    set_sprite_tile(itm->sat_idx+1, PTS_0_TILE_IDX);
+
     game_change_state(GAMESTATE_ITEM, ITEM_FX_PAUSE);
     on_player_boost(&player);
-    play_soundfx(SOUNDFX_ITEM);
     update_score();
 }
 
@@ -1124,11 +1158,6 @@ void update_background(void) {
 }
 
 void init_game(void) {
-    score1 = 0;
-    score2 = 0;
-    highscore1 = 0;
-    highscore2 = 0;
-    
     boost_color_counter = true;
     gamestate = 0xff;
     vdp_busy = false;
@@ -1260,6 +1289,11 @@ void enable_vdp(u8 enable) {
 // [CS] Since we are going to change game states, we need to init before
 //      entering the state
 void init_gameover(void) {
+    stop_sound_fx(0);
+    stop_sound_fx(1);
+    stop_sound_fx(2);
+    stop_sound_fx(3);
+
     play_music(MUSIC_GAMEOVER);
 
     // check for hi-score
@@ -1327,6 +1361,10 @@ void init_title(void) {
     puts("MADE WITH GBDK");
 
     gamestate_counter = 10;
+    score1 = 0;
+    score2 = 0;
+    highscore1 = 0;
+    highscore2 = 0;
 
     // for (i = 0; SOUNDFX_ITEM[i] != END; i++) {
     //     EMU_printf("%d ", SOUNDFX_ITEM[i]);
@@ -1377,6 +1415,8 @@ void init_run(void) {
     weaver_color_counter = 5;
     refresh_hud_score = false;
     refresh_hud_hiscore = false;
+    item_combo = 0;
+    item_combo_5 = 0;
 
     // wait(120);
     enable_vdp(true);
@@ -1421,31 +1461,31 @@ void gamestate_fun_title(void) {
     static u8 mode = NOISE_MODE_PERIODIC;
     static u16 tone= C1;
 
-    if (key_pressed(JOY_P1_LEFT)) {
-        shift++;
-        shift &= 0x03;
-        set_volume(3, VOL_MAX);
-        play_noise(mode, shift);
-    } else
-    if (key_pressed(JOY_P1_RIGHT)) {
-        mode++;
-        mode &= 0x01;
-        set_volume(3, VOL_MAX);
-        play_noise(mode, shift);
-    } else
-    if (key_pressed(JOY_P1_UP)) {
-        // set_volume(0, VOL_MAX);
-        // PSG = 0x8A;
-        // PSG = 0x1F;        
-       play_soundfx(SOUNDFX_ITEM);
-    } else
-    if (key_pressed(JOY_P1_DOWN)) {
-        play_music(MUSIC_READY);
-        // for (i = 0; MUSIC_READY[i] != END; i++) {
-        //     EMU_printf("%d ", MUSIC_READY[i]);
-        // __asm__("nop");
-        // set_volume(0, VOL_MUTE);
-    }
+    // if (key_pressed(JOY_P1_LEFT)) {
+    //     shift++;
+    //     shift &= 0x03;
+    //     set_volume(3, VOL_MAX);
+    //     play_noise(mode, shift);
+    // } else
+    // if (key_pressed(JOY_P1_RIGHT)) {
+    //     mode++;
+    //     mode &= 0x01;
+    //     set_volume(3, VOL_MAX);
+    //     play_noise(mode, shift);
+    // } else
+    // if (key_pressed(JOY_P1_UP)) {
+    //     // set_volume(0, VOL_MAX);
+    //     // PSG = 0x8A;
+    //     // PSG = 0x1F;        
+    // //    play_soundfx(SOUNDFX_ITEM);
+    // } else
+    // if (key_pressed(JOY_P1_DOWN)) {
+    //     play_music(MUSIC_READY);
+    //     // for (i = 0; MUSIC_READY[i] != END; i++) {
+    //     //     EMU_printf("%d ", MUSIC_READY[i]);
+    //     // __asm__("nop");
+    //     // set_volume(0, VOL_MUTE);
+    // }
 }
 
 void gamestate_fun_ready(void) {
@@ -1495,6 +1535,8 @@ void launch_bat(void) {
         
         bat->active = true;
         bat->counter = BAT_APPEAR_BLINK_INTERVAL;
+
+        play_soundfx(SOUNDFX_BAT_APPEAR);
 
         bat_change_state(bat, BAT_STATE_APPEAR, 120);
 
@@ -1600,9 +1642,13 @@ void main(void) {
 
     while (1) {
         key_update();
+
+        volume_decay();
         update_music();
         update_soundfx();
+
         gamestate_update();
+
         vsync();
     }
 }

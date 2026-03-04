@@ -16,8 +16,12 @@ static u8* music_pointer = 0;
 static u8* music_address = 0;
 static i16 music_bpm;
 
+#define SOUNDFX_DELAY 2
+
 static u8* soundfx_pointer[4] = {0,0,0,0};
+static u8* soundfx_address[4] = {0,0,0,0};
 static u8 soundfx_playing = 0;
+static u8 soundfx_delay = SOUNDFX_DELAY;
 
 static u8 vol0;
 static u8 vol1;
@@ -73,18 +77,14 @@ void play_music(u8* pointer) {
     decay_counter = DECAY_DELAY;
     
     music_playing = true;
-    set_volume(0, VOL_MUTE);
-    set_volume(1, VOL_MUTE);
-    set_volume(2, VOL_MUTE);
-    set_volume(3, VOL_MUTE);
 }
 
 void stop_music(void) {
     music_playing = false;
-    set_volume(0, VOL_MUTE);
-    set_volume(1, VOL_MUTE);
-    set_volume(2, VOL_MUTE);
-    set_volume(3, VOL_MUTE);
+    // set_volume(0, VOL_MUTE);
+    // set_volume(1, VOL_MUTE);
+    // set_volume(2, VOL_MUTE);
+    // set_volume(3, VOL_MUTE);
 }
 
 void volume_decay(void) {
@@ -103,9 +103,6 @@ void volume_decay(void) {
 }
 
 void update_music(void) {
-    // NOTE: update_sounddx() relies on volume_decay() and BPM from this call
-    volume_decay();
-
     // bpm
     if (music_bpm > 0) {
         // music_bpm -= floatTofix(40);
@@ -125,7 +122,8 @@ void update_music(void) {
         u8 cmd = *music_pointer++;
 
         if (cmd == END) {           // end of song
-            stop_music();
+            //stop_music();
+            music_playing = false;
             break;
         }
         if (cmd == LOOP) {
@@ -147,6 +145,7 @@ void update_music(void) {
             // [1][CC][1][vvvv]
             u8 ch = (*music_pointer & 0x60) >> 5;
             u8 vv = *music_pointer & 0x0f;
+            if (vv == 0x0f) vv -= 2;
             switch (ch) {
                 case 0: vol0 = vv+2; break;
                 case 1: vol1 = vv+2; break;
@@ -160,13 +159,22 @@ void update_music(void) {
 void play_soundfx(u8* pointer) {
     u8 channel = (*pointer & 0x60) >> 5;
     soundfx_pointer[channel] = pointer;
+    soundfx_address[channel] = pointer;
     soundfx_playing |= 1 << channel;
+}
+
+void stop_sound_fx(u8 channel) {
+    // set_volume(channel, VOL_MUTE);
+    soundfx_playing &= ~(1 << channel);
 }
 
 void update_soundfx(void) {
     // volume_decay();    
     // sync with music BPM
-    if (music_bpm != MUSIC_READY_BPM) return;
+    // if (music_bpm != MUSIC_READY_BPM) return;
+    --soundfx_delay;
+    if (soundfx_delay) return;
+    soundfx_delay = SOUNDFX_DELAY;
 
     // loop through all channels: 3,2,1,0
     u8 channel = 4;
@@ -182,6 +190,11 @@ void update_soundfx(void) {
             continue;
         }
 
+        if (cmd == LOOP) {
+            pointer = soundfx_address[channel];
+            soundfx_pointer[channel] = pointer;
+        }
+
         // play soundFX
         PSG = cmd;      // tone byte 1
         ++pointer;
@@ -191,6 +204,7 @@ void update_soundfx(void) {
         
         // [1][CC][1][vvvv]
         u8 vv = *pointer & 0x0f;
+        if (vv == 0x0f) vv -= 2;
         switch (channel) {
             case 0: vol0 = vv+2; break;
             case 1: vol1 = vv+2; break;
