@@ -9,6 +9,7 @@
 #include <sms/sms.h>
 #include <gbdk/emu_debug.h>
 #include <stdio.h>
+#include <gbdk/font.h>
 
 #define PRINT_BUTTON(BTN) { \
     if (buttons & BTN) {    \
@@ -18,10 +19,16 @@
     }                       \
 }
 
-void main() {
+void main(void) {
+    font_t min_font;
     uint8_t buttons;
 
-    printf("Master System Programming!\n\nPress any button:\n");
+    font_init();
+    min_font = font_load(font_min); // font_spect
+    font_set(min_font);
+
+    // printf("Master System Programming!\n\nPress any button:\n");
+    printf("Score 000140    HighScore 096750\n");
 
     EMU_TEXT("Hello");
 

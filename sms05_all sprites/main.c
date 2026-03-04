@@ -52,6 +52,33 @@ void init_bats(void) {
     }
 }
 
+void update_bat(Bat* bat) {
+    // move bat
+    bat->x += bat->spx;
+    bat->y += bat->spy;
+
+    // bounce off screen
+    if (bat->x < 8) {
+        bat->x = 8;
+        bat->spx = -bat->spx;
+    } 
+    else
+    if (bat->x > SCREEN_WIDTH-16) {
+        bat->x = SCREEN_WIDTH-16;
+        bat->spx = -bat->spx;
+    }
+
+    if (bat->y < 8) {
+        bat->y = 8;
+        bat->spy = -bat->spy;
+    } 
+    else
+    if (bat->y > SCREEN_HEIGHT-16) {
+        bat->y = SCREEN_HEIGHT-16;
+        bat->spy = -bat->spy;
+    }
+}
+
 void main(void) {
     u8 x = SCREEN_WIDTH/2-16, y = SCREEN_HEIGHT/2-16;
     u8 count = 10, frame = 0;
@@ -69,6 +96,8 @@ void main(void) {
     
     init_bats();
 
+    __WRITE_VDP_REG(VDP_R0, __READ_VDP_REG(VDP_R0) |= R0_LCB);     // left column blank
+    
     DISPLAY_ON;
     SHOW_BKG;
     SHOW_SPRITES;
@@ -78,6 +107,7 @@ void main(void) {
 
         j = 0;
         for (i = 0; i < MAX_METASPR; i++) {
+            // update_bat(&bats[i]);
             bats[i].x += bats[i].spx;
             bats[i].y += bats[i].spy;
             bats[i].x = wrap(bats[i].x, 2, SCREEN_WIDTH-2);

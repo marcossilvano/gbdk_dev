@@ -1,0 +1,1 @@
+type=instruction address=PrintDigit%20+%208 end=PrintDigit%20+%2010 enabled=true suspend=true condition= message=
