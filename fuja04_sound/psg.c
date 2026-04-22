@@ -61,6 +61,27 @@ void play_tone(uint8_t channel, uint16_t tone) {
     PSG = (tone >> 4) & 0b00111111;
 }
 
+void set_volume(uint8_t channel, uint8_t volume) {
+    // Latch Volume
+    // [1][cc][1][vvvv] = Flag (1) + Channel + Set Volume (1) + Volume
+    // PSG = 0b10010000 | (channel << 5) | (volume & 0x0f);
+    PSG = 0x90 | (channel << 5) | (volume & 0x0f);
+}
+
+#define PSG_NOISE_REG 0xE0 // 1110 0000 (Channel 3, Noise Type)
+
+// mode: 0 for Periodic, 1 for White Noise
+// shift: 0 (Fast), 1 (Medium), 2 (Slow), 3 (Follow Channel 2)
+void play_noise(uint8_t mode, uint8_t shift) {
+    if (mode != noise_mode || shift != noise_shift) {
+        noise_mode = mode;
+        noise_shift= shift;
+        // Play Noise
+        // [1][11][0][0][mss] = Flag (1) + Channel 3 (11) + Type tone (0) + Unused + Mode + Shift
+        PSG = 0b11100000 | (mode << 2) | (shift & 0b00000011);
+    }
+}
+
 void play_tone_raw(u8 byte1, u8 byte2) {
     PSG = byte1;
     PSG = byte2;
@@ -216,23 +237,3 @@ void update_soundfx(void) {
     } while (channel);
 }
 
-void set_volume(uint8_t channel, uint8_t volume) {
-    // Latch Volume
-    // [1][cc][1][vvvv] = Flag (1) + Channel + Set Volume (1) + Volume
-    // PSG = 0b10010000 | (channel << 5) | (volume & 0x0f);
-    PSG = 0x90 | (channel << 5) | (volume & 0x0f);
-}
-
-#define PSG_NOISE_REG 0xE0 // 1110 0000 (Channel 3, Noise Type)
-
-// mode: 0 for Periodic, 1 for White Noise
-// shift: 0 (Fast), 1 (Medium), 2 (Slow), 3 (Follow Channel 2)
-void play_noise(uint8_t mode, uint8_t shift) {
-    if (mode != noise_mode || shift != noise_shift) {
-        noise_mode = mode;
-        noise_shift= shift;
-        // Play Noise
-        // %1cc00mss = 1 (flag) + 11 (channel 3) + 0 (type noise) + 0 (unused) + m (mode) + ss (shift)
-        PSG = 0b11100000 | (mode << 2) | (shift & 0b00000011);
-    }
-}

@@ -1,0 +1,55 @@
+{
+    "automappingRulesFile": "",
+    "commands": [
+    ],
+    "compatibilityVersion": 1100,
+    "extensionsPath": "extensions",
+    "folders": [
+        "."
+    ],
+    "properties": [
+    ],
+    "propertyTypes": [
+        {
+            "color": "#ffa0a0a4",
+            "drawFill": true,
+            "id": 1,
+            "members": [
+                {
+                    "name": "type",
+                    "propertyType": "FujaObjectType",
+                    "type": "string",
+                    "value": "Diver"
+                }
+            ],
+            "name": "FujaObject",
+            "type": "class",
+            "useAs": [
+                "property",
+                "map",
+                "layer",
+                "object",
+                "tile",
+                "tileset",
+                "wangcolor",
+                "wangset",
+                "project"
+            ]
+        },
+        {
+            "id": 2,
+            "name": "FujaObjectType",
+            "storageType": "string",
+            "type": "enum",
+            "values": [
+                "Diver",
+                "Bouncer",
+                "BouncerV",
+                "BouncerH",
+                "Seeker",
+                "Player"
+            ],
+            "valuesAsFlags": false
+        }
+    ]
+}

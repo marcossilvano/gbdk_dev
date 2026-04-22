@@ -1,0 +1,1 @@
+python png2sms.py sprites.png sprites 8 16

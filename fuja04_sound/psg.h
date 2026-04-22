@@ -48,7 +48,8 @@ CONSTANT VALUE:
 ld hl, $01A9
 */
 
-// [CS] How ensure that will be stored in ROM? Inlining and constant propagation
+// [CS] How ensure that a frequency array and corresponding indexes enum
+// will be stored in ROM? Inlining and constant propagation
 /*
 Inlining and Constant Propagation:
 - When you put a CONST array in a header file, every .c file that includes it 
@@ -99,6 +100,11 @@ enum NotesLabels {
 };
 
 // [CS] Macros as a way to pack data efficiently
+// [CS] When making sound examples, give the hardcoded version first:
+//      PSG = 10000011      freq = 110101 0011 = 0x353 (C1)
+//      PSG = 00110101
+//      PSG = 10010000      max volume
+
 
 // 16 bit (8+8) play_tone() PSG format + 8 bit latcc volume
 // PSG Format: [1][cc][0][nnnn], [0][x][nnnnnn] << 8
@@ -118,8 +124,9 @@ enum NotesLabels {
 // FORMAT: [0][ttttttt]
 #define WAIT(dur) ((dur) & 0x7f)
 
-#define END 0xff
-#define LOOP 0xef
+#define END  0x00 // 000w wwww
+#define LOOP 0x40 // 010w wwww
+#define NEXT 0x20 // 001w wwww
 
 // [CS] Multiplexing problem? 3 streams of data (3 channels) and one single hw output (PSG)
 static const u8 const MUSIC_READY[] = {
@@ -396,10 +403,10 @@ static const u8 const MUSIC_INTRO[] = {
 // SOUND FX ////////////////////////////////////////////////////////////////////
 
 static const u8 const SOUNDFX_BAT_BOUNCE[] = {
-  NOTE(A0, 0x03, 2), 
-  NOTE(A0, 0x03, 2), 
-  NOTE(A1, 0x03, 2), 
-  NOTE(A1, 0x03, 2), 
+  NOTE(A0, 0x03, 1), 
+  NOTE(A0, 0x03, 1), 
+  NOTE(A1, 0x03, 1), 
+  NOTE(A1, 0x03, 1), 
   END
 };
 
@@ -420,7 +427,7 @@ static const u8 const SOUNDFX_BAT_APPEAR[] = {
   NOTE(F1, VOL_MUTE, 1), 
   NOTE(F1, VOL_MUTE, 1), 
 
-  LOOP
+  END // @ LOOP is interfering with noise (follow2?)
 };
 
 static const u8 const SOUNDFX_ITEM_50[] = {

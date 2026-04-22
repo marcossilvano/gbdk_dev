@@ -1,0 +1,48 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "_level12.tmx",
+    "expandedProjectPaths": [
+    ],
+    "file.lastUsedOpenFilter": "All Files (*)",
+    "fileStates": {
+        "_level12.tmx": {
+            "scale": 4.4234374999999995,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 127.95478629459558,
+                "y": 96.07912398445778
+            }
+        },
+        "sprite_tile.tsx": {
+            "scaleInDock": 3
+        },
+        "teste.tmx": {
+            "scale": 4.4234374999999995,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 127.95478629459558,
+                "y": 96.07912398445778
+            }
+        },
+        "wall_tile8.tsx": {
+            "scaleInDock": 5.5
+        }
+    },
+    "map.height": 24,
+    "map.lastUsedFormat": "tmx",
+    "map.tileHeight": 8,
+    "map.tileWidth": 8,
+    "map.width": 32,
+    "openFiles": [
+        "_level12.tmx"
+    ],
+    "project": "fuja.tiled-project",
+    "property.type": "FujaObjectType",
+    "recentFiles": [
+        "_level12.tmx",
+        "teste.tmx"
+    ]
+}
